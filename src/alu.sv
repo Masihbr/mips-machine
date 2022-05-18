@@ -1,0 +1,37 @@
+module alu(
+    alu_result,
+	zero,
+	a, 
+    b,
+    control
+);
+    parameter LENGTH = 32, CONTROL_LENGTH = 4;
+
+
+    input [LENGTH-1:0]          a;
+    input [LENGTH-1:0]          b;
+    input [CONTROL_LENGTH-1:0]  control;
+    output reg [LENGTH-1:0]     alu_control;
+    output                      zero;
+
+    assign zero = (alu_result == 0);
+
+    always_comb @(*) begin
+        case (control)
+            0: alu_result = $sigend(a) + $signed(b); // add
+            1: alu_result = $signed(a) - $signed(b); //signed sub
+            2: alu_result = a + b; // unsigned add
+            3: alu_result = a - b; // unsigned sub
+            4: alu_result = a & b; // and
+            5: alu_result = a ^ b; // xor
+            6: alu_result = a ~ b; // nor
+            7: alu_result = a << b; // unsigned shift left
+            8: alu_result = a >> b; // unsigned shift right
+            9: alu_result = a > b; //compare
+            10: alu_result = $signed(a) * $signed(b); // mult
+            11: alu_result = $signed(a) / $signed(b); // div
+            12: alu_result = a >>> b; // signed shift right  
+            default: alu_result = 0;
+        endcase
+    end
+endmodule

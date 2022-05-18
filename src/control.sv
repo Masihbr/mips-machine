@@ -1,0 +1,2 @@
+module control();
+endmodule
