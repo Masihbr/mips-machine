@@ -32,6 +32,11 @@ module control(
         alu_op = 3'b000;
         jump = 1'b0;
         case (opcode)
+            6'b000000: begin
+                alu_src = 2'b00;
+                reg_write = 1'b1;
+                reg_dst = 1'b1;
+            end
             6'b001000: begin
                 alu_src = 2'b10;
                 reg_write = 1'b1;

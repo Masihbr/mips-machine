@@ -113,7 +113,8 @@ module mips_core(
     assign halted = (opcode == 0 && func == 6'b001100) ? 1'b1 : 1'b0;
 
     always_ff @(posedge clk) begin
-        // $display("inst=%b,\npc=%b,\na=%b,\nb=%b\nalu_res=%b,\nrd_data=%b,\nalu_src=%b,im=%b", inst,pc, a, b, alu_result, rd_data,alu_src, sign_extend_immediate);
+        // $display("inst=%b,\npc=%b,\na=%b,\nb=%b\nalu_res=%b,\nrd_data=%b,\nalu_src=%b,im=%b\n rd_num=%b\n-------------------------------------",
+        //  inst,pc, a, b, alu_result, rd_data,alu_src, sign_extend_immediate, rd_num);
         if (rst_b == 0) begin
             pc <= 0;
         end else begin
