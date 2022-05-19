@@ -30,15 +30,17 @@ module alu_control(
                 6'b000011: control = 12;
                 default: control = 0;
             endcase
-        end
+        end else begin
         case (alu_op)
             3'b001: control = 0; // addi, b*, lw, sw, lb, sb,
             3'b010: control = 2; // addiu
             3'b011: control = 4; // andi
-            3'b100: control = 5; //xori
+            3'b100: control = 5; // xori
             3'b101: control = 13; // ori
             3'b110: control = 9; // slti
+            3'b111: control = 14; // lui
             default: control = 0; 
         endcase
+        end
     end
 endmodule

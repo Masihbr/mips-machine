@@ -40,6 +40,7 @@ module mips_core(
     wire             branch;
     wire [2:0]       alu_op;
     wire             jump;
+    wire             do_extend;
     wire [5:0]       opcode;
     wire [3:0]       control;
     wire [5:0]       func;
@@ -76,7 +77,9 @@ module mips_core(
         .mem_write(mem_write),
         .branch(branch),
         .alu_op(alu_op),
+        .do_extend(do_extend),
         .jump(jump),
+        .func(func),
         .opcode(opcode)
     );
 
@@ -104,7 +107,7 @@ module mips_core(
     assign sh_amount = inst[10:6]; 
     assign opcode = inst[31:26];
     assign func = inst[5:0];
-    assign sign_extend_immediate = {{16{immediate_data[15]}}, immediate_data};
+    assign sign_extend_immediate = (do_extend) ? {{16{immediate_data[15]}}, immediate_data} : {16'b0, immediate_data};
     assign a = (alu_src[0] == 1'b1) ? {{27{1'b0}},sh_amount} : rs_data;
     assign b = (alu_src[1] == 1'b1) ? sign_extend_immediate : rt_data;
 
@@ -113,8 +116,8 @@ module mips_core(
     assign halted = (opcode == 0 && func == 6'b001100) ? 1'b1 : 1'b0;
 
     always_ff @(posedge clk) begin
-        // $display("inst=%b,\npc=%b,\na=%b,\nb=%b\nalu_res=%b,\nrd_data=%b,\nalu_src=%b,im=%b\n rd_num=%b\n-------------------------------------",
-        //  inst,pc, a, b, alu_result, rd_data,alu_src, sign_extend_immediate, rd_num);
+        $display("inst=%b\npc=%b\na=%b\nb=%b\nalu_res=%b\nrd_data=%b\nalu_src=%b\nim=%b\nrd_num=%b\ncontrol=%d\nalu_op=%b\nfunc=%b\n-------------------------------------",
+        inst,pc, a, b, alu_result, rd_data,alu_src, sign_extend_immediate, rd_num, control, alu_op, func);
         if (rst_b == 0) begin
             pc <= 0;
         end else begin
