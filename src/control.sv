@@ -7,6 +7,7 @@ module control(
     mem_write,
     branch,
     alu_op,
+    jr,
     jump,
     do_extend,
     opcode,
@@ -21,9 +22,10 @@ module control(
     output reg reg_write;
     output reg mem_read;
     output reg mem_write;
-    output reg branch;
-    output reg [2:0] alu_op;
-    output reg jump;
+    output reg [2:0] branch;
+    output reg [3:0] alu_op;
+    output reg jr;
+    output reg [1:0]jump;
     output reg do_extend;
     always_comb begin
         reg_dst = 1'b0;
@@ -32,11 +34,13 @@ module control(
         reg_write = 1'b0;
         mem_read = 1'b0;
         mem_write = 1'b0;
-        branch = 1'b0;
-        alu_op = 3'b000;
+        branch = 3'b000;
+        alu_op = 4'b0000;
         do_extend = 1'b1;
-        jump = 1'b0;
-        case (opcode)
+        jr = 1'b0;
+        jump = 2'b00;
+        /* verilator lint_off CASEX */
+        casex (opcode)
             6'b000000: begin
                 alu_src = 2'b00;
                 reg_write = 1'b1;
@@ -44,38 +48,68 @@ module control(
                 case (func)
                     6'b000000, 6'b000010, 6'b000011: begin
                     alu_src[0] = 1'b1; // use sh_amount
-                    alu_op = 3'b000;
+                    alu_op = 4'b0000;
+                    end
+                    6'b001000: begin
+                        jr = 1'b1;
                     end
                     default: begin
                     end
                 endcase
             end
-            6'b001000: begin
+            6'b001000: begin //ADDi
                 alu_src = 2'b10;
                 reg_write = 1'b1;
-                alu_op = 3'b001;
+                alu_op = 4'b0001;
             end
-            6'b001001: begin
+            6'b001001: begin //ADDiu
                 alu_src = 2'b10;
                 reg_write = 1'b1;
-                alu_op = 3'b010;
+                alu_op = 4'b0010;
             end
-            6'b001110: begin
+            6'b001100: begin //ANDi
                 alu_src = 2'b10;
                 reg_write = 1'b1;
-                alu_op = 3'b100;
+                alu_op = 4'b0011;
+                do_extend = 1'b0;
             end
-            6'b001111: begin
+            6'b001110: begin //XORi
                 alu_src = 2'b10;
                 reg_write = 1'b1;
-                alu_op = 3'b111;
+                alu_op = 4'b0100;
+                do_extend = 1'b0;
             end
-            6'b001101: begin
+            6'b001101: begin// ORi
                 alu_src = 2'b10;
                 reg_write = 1'b1;
                 do_extend = 1'b0;
-                alu_op = 3'b101;
+                alu_op = 4'b0101;
             end
+
+            6'b0001xx: begin //BEQ, BNE, BLEZ, BGTZ
+                alu_src = 2'b00;
+                branch = opcode[2:0];
+                alu_op = 4'b1000;
+            end
+            6'b000001: begin //BGEZ
+                alu_src = 2'b00;
+                branch = 3'b001;
+            end
+            6'b001111: begin// Lui
+                alu_src = 2'b10;
+                reg_write = 1'b1;
+                alu_op = 4'b0111;
+            end
+
+            6'b000010: begin // j
+                jump = 2'b01;
+            end
+
+            6'b000011: begin //jal
+                jump = 2'b10;
+                reg_write = 1'b1;
+            end
+            
             default: begin
                 alu_src = 2'b00;
             end

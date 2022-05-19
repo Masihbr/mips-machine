@@ -37,9 +37,10 @@ module mips_core(
     wire             reg_write;
     wire             mem_read;
     wire             mem_write;
-    wire             branch;
-    wire [2:0]       alu_op;
-    wire             jump;
+    wire [2:0]       branch;
+    wire [3:0]       alu_op;
+    wire             jr;
+    wire [1:0]       jump;
     wire             do_extend;
     wire [5:0]       opcode;
     wire [3:0]       control;
@@ -51,8 +52,10 @@ module mips_core(
     wire [15:0]      immediate_data;
     wire [4:0]       sh_amount;
     wire [31:0]      sign_extend_immediate;
-    wire [31:0]      next_pc;
-    reg [31:0] pc;
+    wire [25:0]     address;
+    reg [31:0]       next_pc;
+    reg [31:0]       pc;
+    reg [31:0]       pc4;
 
 
     regfile regfile_unit(
@@ -78,6 +81,7 @@ module mips_core(
         .branch(branch),
         .alu_op(alu_op),
         .do_extend(do_extend),
+        .jr(jr),
         .jump(jump),
         .func(func),
         .opcode(opcode)
@@ -99,9 +103,9 @@ module mips_core(
 
     assign rs_num = inst[25:21];
     assign rt_num = inst[20:16];
-    assign rd_num = (reg_dst == 1'b1) ? inst[15:11] : rt_num;
+    assign rd_num = (reg_dst == 1'b1) ? inst[15:11] : (jump == 2'b10) ? 5'd31 : rt_num;
 
-    assign rd_data = (mem_to_reg == 1'b1) ? 32'b0 : alu_result;
+    assign rd_data = (mem_to_reg == 1'b1) ? 32'b0 : (jump == 2'b10) ? pc + 8 : alu_result;
 
     assign immediate_data = inst[15:0];
     assign sh_amount = inst[10:6]; 
@@ -111,13 +115,58 @@ module mips_core(
     assign a = (alu_src[0] == 1'b1) ? {{27{1'b0}},sh_amount} : rs_data;
     assign b = (alu_src[1] == 1'b1) ? sign_extend_immediate : rt_data;
 
-    assign next_pc = pc + 4;
+    assign address = inst[25:0];
+    assign pc4 = pc + 4;
+
     assign inst_addr = pc;
     assign halted = (opcode == 0 && func == 6'b001100) ? 1'b1 : 1'b0;
 
+    always_comb begin
+        next_pc = pc4;
+        if (jump != 2'b00) begin
+            next_pc = {pc4[31:28] ,address, 2'b00}; 
+        end 
+        else if (jr == 1'b1) begin
+            next_pc = rs_data;
+        end
+        else begin
+            case(branch)
+                3'b100: begin
+                    if (zero == 1'b1) begin
+                        next_pc = pc4 + {sign_extend_immediate[29:0],2'b00};
+                    end
+                end
+                3'b101: begin
+                    if (zero == 1'b0) begin
+                        next_pc = pc4 + {sign_extend_immediate[29:0],2'b00};
+                    end
+                end 
+
+                3'b110: begin
+                    if ($signed(rs_data) <= 0) begin
+                        next_pc = pc4 + {sign_extend_immediate[29:0],2'b00};
+                    end
+                end
+
+                3'b111: begin
+                    if ($signed(rs_data) > 0) begin
+                        next_pc = pc4 + {sign_extend_immediate[29:0],2'b00};
+                    end
+                end
+
+                3'b001: begin
+                    if ($signed(rs_data) >= 0) begin
+                        next_pc = pc4 + {sign_extend_immediate[29:0],2'b00};
+                    end
+                end
+                default: next_pc = pc4;
+            endcase
+        end
+    end
+
     always_ff @(posedge clk) begin
-        $display("inst=%b\npc=%b\na=%b\nb=%b\nalu_res=%b\nrd_data=%b\nalu_src=%b\nim=%b\nrd_num=%b\ncontrol=%d\nalu_op=%b\nfunc=%b\n-------------------------------------",
-        inst,pc, a, b, alu_result, rd_data,alu_src, sign_extend_immediate, rd_num, control, alu_op, func);
+        $display("inst=%b\npc=%d\na=%b\nb=%b\nalu_res=%b\nrd_data=%b\nalu_src=%b\nim=%b\nrd_num=%b\ncontrol=%d\nalu_op=%b\nfunc=%b\nnext_pc=%d\n-------------------------------------",
+        inst,pc, a, b, alu_result, rd_data,alu_src, sign_extend_immediate, rd_num, control, alu_op, func, next_pc);
         if (rst_b == 0) begin
             pc <= 0;
         end else begin

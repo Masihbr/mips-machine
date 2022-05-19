@@ -3,7 +3,7 @@ module alu_control(
     alu_op,
     func
 );
-    parameter FUNCT_LENGTH = 6, ALU_OP_LENTH = 3, CONTROL_LENGTH = 4;
+    parameter FUNCT_LENGTH = 6, ALU_OP_LENTH = 4, CONTROL_LENGTH = 4;
 
     input [FUNCT_LENGTH-1:0]    func;
     input [ALU_OP_LENTH-1:0]    alu_op;
@@ -32,13 +32,14 @@ module alu_control(
             endcase
         end else begin
         case (alu_op)
-            3'b001: control = 0; // addi, b*, lw, sw, lb, sb,
-            3'b010: control = 2; // addiu
-            3'b011: control = 4; // andi
-            3'b100: control = 5; // xori
-            3'b101: control = 13; // ori
-            3'b110: control = 9; // slti
-            3'b111: control = 14; // lui
+            4'b0001: control = 0; // addi, b*, lw, sw, lb, sb,
+            4'b0010: control = 2; // addiu
+            4'b0011: control = 4; // andi
+            4'b0100: control = 5; // xori
+            4'b0101: control = 13; // ori
+            4'b0110: control = 9; // slti
+            4'b0111: control = 14; // lui
+            4'b1000: control = 3; // (sub)beq
             default: control = 0; 
         endcase
         end
