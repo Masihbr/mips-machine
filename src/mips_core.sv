@@ -117,7 +117,7 @@ module mips_core(
     assign rt_num = inst[20:16];
     assign rd_num = (reg_dst == 1'b1) ? inst[15:11] : (jump == 2'b10) ? 5'd31 : rt_num;
 
-    assign rd_data = (mem_to_reg == 1'b1) ? 32'b0 : (jump == 2'b10) ? pc + 8 : alu_result;
+    assign rd_data = (mem_to_reg == 1'b1) ? mem_data_out : (jump == 2'b10) ? pc + 8 : alu_result;
 
     assign immediate_data = inst[15:0];
     assign sh_amount = inst[10:6]; 
