@@ -121,6 +121,10 @@ module mips_core(
     assign inst_addr = pc;
     assign halted = (opcode == 0 && func == 6'b001100) ? 1'b1 : 1'b0;
 
+    assign mem_write_en = mem_write;
+    assign mem_addr = alu_result;
+
+
     always_comb begin
         next_pc = pc4;
         if (jump != 2'b00) begin
