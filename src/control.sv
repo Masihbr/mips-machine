@@ -66,6 +66,7 @@ module control(
                 alu_src = 2'b10;
                 reg_write = 1'b1;
                 alu_op = 4'b0010;
+                do_extend = 1'b0;
             end
             6'b001100: begin //ANDi
                 alu_src = 2'b10;
