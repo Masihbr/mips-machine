@@ -57,6 +57,10 @@ module mips_core(
     reg  [31:0]      pc;
     reg  [31:0]      pc4;
 
+    wire [31:0] mem_data_out_32_bit;
+
+
+
 
     regfile regfile_unit(
         .rs_data(rs_data),
@@ -117,7 +121,11 @@ module mips_core(
     assign rt_num = inst[20:16];
     assign rd_num = (reg_dst == 1'b1) ? inst[15:11] : (jump == 2'b10) ? 5'd31 : rt_num;
 
-    assign rd_data = (mem_to_reg == 1'b1) ? mem_data_out : (jump == 2'b10) ? pc + 8 : alu_result;
+    assign mem_data_out_32_bit = {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]};
+
+    assign rd_data = (mem_to_reg == 1'b1) ? mem_data_out_32_bit : (jump == 2'b10) ? pc + 8 : alu_result;
+
+    
 
     assign immediate_data = inst[15:0];
     assign sh_amount = inst[10:6]; 
@@ -134,6 +142,11 @@ module mips_core(
 
     assign mem_write_en = mem_write;
     assign mem_addr = alu_result;
+
+    assign mem_data_in[0] = rt_data[31 -: 8]; // should be changed for LB and SB commands
+    assign mem_data_in[1] = rt_data[31-8 -: 8];
+    assign mem_data_in[2] = rt_data[31-16 -: 8];
+    assign mem_data_in[3] = rt_data[31-24 -: 8];
 
     always_ff @(posedge clk) begin
         $display("inst=%b\npc=%d\na=%b\nb=%b\nalu_res=%b\nrd_data=%b\nalu_src=%b\nim=%b\nrd_num=%b\ncontrol=%d\nalu_op=%b\nfunc=%b\nnext_pc=%d\n-------------------------------------",

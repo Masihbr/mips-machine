@@ -119,6 +119,13 @@ module control(
                 mem_to_reg = 1;
 
             end
+
+            6'b101011: begin // SW
+                alu_src = 2'b10;
+                alu_op = 4'b0001;
+                mem_write = 1'b1;
+                
+            end
             
             default: begin
                 alu_src = 2'b00;
