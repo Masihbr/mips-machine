@@ -109,6 +109,13 @@ module control(
                 jump = 2'b10;
                 reg_write = 1'b1;
             end
+
+            6'b100011: begin // LW 
+                alu_src = 2'b10;
+                reg_write = 1'b1;
+                alu_op = 4'b0001;
+                mem_read = 1'b1;
+            end
             
             default: begin
                 alu_src = 2'b00;
