@@ -37,6 +37,7 @@ module mips_core(
     wire             reg_write;
     wire             mem_read;
     wire             mem_write;
+    wire             is_LW_SW;
     wire [2:0]       branch;
     wire [3:0]       alu_op;
     wire             jr;
@@ -76,6 +77,7 @@ module mips_core(
     );
 
     control control_unit(
+        .is_LW_SW(is_LW_SW),
         .reg_dst(reg_dst),
         .alu_src(alu_src),
         .mem_to_reg(mem_to_reg),
@@ -121,7 +123,7 @@ module mips_core(
     assign rt_num = inst[20:16];
     assign rd_num = (reg_dst == 1'b1) ? inst[15:11] : (jump == 2'b10) ? 5'd31 : rt_num;
 
-    assign mem_data_out_32_bit = {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]};
+    assign mem_data_out_32_bit = (is_LW_SW == 1'b0) ? {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]} : {24'b0, mem_data_out[0]};
 
     assign rd_data = (mem_to_reg == 1'b1) ? mem_data_out_32_bit : (jump == 2'b10) ? pc + 8 : alu_result;
 
@@ -143,10 +145,10 @@ module mips_core(
     assign mem_write_en = mem_write;
     assign mem_addr = alu_result;
 
-    assign mem_data_in[0] = rt_data[31 -: 8]; // should be changed for LB and SB commands
-    assign mem_data_in[1] = rt_data[31-8 -: 8];
-    assign mem_data_in[2] = rt_data[31-16 -: 8];
-    assign mem_data_in[3] = rt_data[31-24 -: 8];
+    assign mem_data_in[0] = (is_LW_SW == 1'b0) ? rt_data[31 -: 8] : rt_data[31-24 -: 8]; // should be changed for LB and SB commands
+    assign mem_data_in[1] = (is_LW_SW == 1'b0) ? rt_data[31-8 -: 8]: 8'b0;
+    assign mem_data_in[2] = (is_LW_SW == 1'b0) ? rt_data[31-16 -: 8] : 8'b0;
+    assign mem_data_in[3] = (is_LW_SW == 1'b0) ? rt_data[31-24 -: 8]: 8'b0;
 
     always_ff @(posedge clk) begin
         $display("inst=%b\npc=%d\na=%b\nb=%b\nalu_res=%b\nrd_data=%b\nalu_src=%b\nim=%b\nrd_num=%b\ncontrol=%d\nalu_op=%b\nfunc=%b\nnext_pc=%d\n-------------------------------------",
