@@ -27,7 +27,7 @@ module alu(
             6: alu_result = a ~| b; // nor
             7: alu_result = b << a; // shift left
             8: alu_result = b >> a; // unsigned shift right
-            9: alu_result = {{31{1'b0}}, (a < b)}; //compare
+            9: alu_result = {{31{1'b0}}, ($signed(a) < $signed(b))}; // compare
             10: alu_result = $signed(a) * $signed(b); // mult
             11: alu_result = $signed(a) / $signed(b); // div
             12: alu_result = $signed(b) >>> a; // signed shift right  
