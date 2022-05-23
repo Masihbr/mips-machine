@@ -59,9 +59,7 @@ module mips_core(
     reg  [31:0]      pc4;
 
     wire [31:0] mem_data_out_32_bit;
-
-
-
+    wire [1:0] mem_block;
 
     regfile regfile_unit(
         .rs_data(rs_data),
