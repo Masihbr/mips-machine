@@ -151,9 +151,10 @@ module control(
                 is_LW_SW = 1'b1;
             end
             
+            
             6'b001010: begin // SLTi
                 alu_src = 2'b10;
-                alu_op = 4'b0101;
+                alu_op = 4'b0110;
                 reg_write = 1'b1;
             end
 
