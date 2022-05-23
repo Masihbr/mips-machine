@@ -123,17 +123,15 @@ module mips_core(
     assign rt_num = inst[20:16];
     assign rd_num = (reg_dst == 1'b1) ? inst[15:11] : (jump == 2'b10) ? 5'd31 : rt_num;
 
-    assign mem_data_out_32_bit = (is_LW_SW == 1'b0) ? {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]} : {24'b0, mem_data_out[0]};
+    assign mem_data_out_32_bit = (is_LW_SW == 1'b0) ? {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]} : { (mem_data_out[3 - (mem_addr % 4)][7] == 1) ? 24'hffffff : 24'b0 , mem_data_out[3 - (mem_addr % 4)]};
 
     assign rd_data = (mem_to_reg == 1'b1) ? mem_data_out_32_bit : (jump == 2'b10) ? pc + 8 : alu_result;
-
-    
 
     assign immediate_data = inst[15:0];
     assign sh_amount = inst[10:6]; 
     assign opcode = inst[31:26];
     assign func = inst[5:0];
-    assign sign_extend_immediate = (do_extend) ? {{16{immediate_data[15]}}, immediate_data} : {16'b0, immediate_data};
+    assign sign_extend_immediate = (do_extend) ? {{16{immediate_data[15]}}, immediate_data} : {16'd0, immediate_data};
     assign a = (alu_src[0] == 1'b1) ? {{27{1'b0}},sh_amount} : rs_data;
     assign b = (alu_src[1] == 1'b1) ? sign_extend_immediate : rt_data;
 
@@ -146,9 +144,9 @@ module mips_core(
     assign mem_addr = alu_result;
 
     assign mem_data_in[0] = (is_LW_SW == 1'b0) ? rt_data[31 -: 8] : rt_data[31-24 -: 8]; // should be changed for LB and SB commands
-    assign mem_data_in[1] = (is_LW_SW == 1'b0) ? rt_data[31-8 -: 8]: 8'b0;
-    assign mem_data_in[2] = (is_LW_SW == 1'b0) ? rt_data[31-16 -: 8] : 8'b0;
-    assign mem_data_in[3] = (is_LW_SW == 1'b0) ? rt_data[31-24 -: 8]: 8'b0;
+    assign mem_data_in[1] = (is_LW_SW == 1'b0) ? rt_data[31-8 -: 8]: mem_data_out[1];
+    assign mem_data_in[2] = (is_LW_SW == 1'b0) ? rt_data[31-16 -: 8] : mem_data_out[2];
+    assign mem_data_in[3] = (is_LW_SW == 1'b0) ? rt_data[31-24 -: 8]: mem_data_out[3];
 
     always_ff @(posedge clk) begin
         $display("inst=%b\npc=%d\na=%b\nb=%b\nalu_res=%b\nrd_data=%b\nalu_src=%b\nim=%b\nrd_num=%b\ncontrol=%d\nalu_op=%b\nfunc=%b\nnext_pc=%d\n-------------------------------------",
