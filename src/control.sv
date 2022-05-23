@@ -1,7 +1,7 @@
 module control(
     reg_dst,
     alu_src,
-    is_LW_SW,
+    is_LB_SB,
     mem_to_reg,
     reg_write,
     mem_read,
@@ -28,7 +28,7 @@ module control(
     output reg jr;
     output reg [1:0]jump;
     output reg do_extend;
-    output reg is_LW_SW;
+    output reg is_LB_SB;
     always_comb begin
         reg_dst = 1'b0;
         alu_src = 2'b00;
@@ -41,7 +41,7 @@ module control(
         do_extend = 1'b1;
         jr = 1'b0;
         jump = 2'b00;
-        is_LW_SW = 1'b0;
+        is_LB_SB = 1'b0;
         /* verilator lint_off CASEX */
         casex (opcode)
             6'b000000: begin // I-type
@@ -141,14 +141,14 @@ module control(
                 alu_op = 4'b0001;
                 mem_read = 1'b1; // has no effect
                 mem_to_reg = 1;
-                is_LW_SW = 1'b1;
+                is_LB_SB = 1'b1;
             end
 
             6'b101000: begin // SB
                 alu_src = 2'b10;
                 alu_op = 4'b0001;
                 mem_write = 1'b1;
-                is_LW_SW = 1'b1;
+                is_LB_SB = 1'b1;
             end
             
             
