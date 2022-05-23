@@ -150,7 +150,7 @@ module mips_core(
     assign mem_data_in[2] = (is_LW_SW == 1'b0) ? rt_data[31-16 -: 8] : mem_data_out[2];
     assign mem_data_in[3] = (is_LW_SW == 1'b0) ? rt_data[31-24 -: 8]: mem_data_out[3];
 
-    always_ff @(posedge clk) begin
+    always_ff @(posedge clk, negedge rst_b) begin
         $display("inst=%b\npc=%d\na=%b\nb=%b\nalu_res=%b\nrd_data=%b\nalu_src=%b\nim=%b\nrd_num=%b\ncontrol=%d\nalu_op=%b\nfunc=%b\nnext_pc=%d\n-------------------------------------",
         inst,pc, a, b, alu_result, rd_data,alu_src, sign_extend_immediate, rd_num, control, alu_op, func, next_pc);
         if (rst_b == 0) begin
