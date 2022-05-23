@@ -123,7 +123,9 @@ module mips_core(
     assign rt_num = inst[20:16];
     assign rd_num = (reg_dst == 1'b1) ? inst[15:11] : (jump == 2'b10) ? 5'd31 : rt_num;
 
-    assign mem_data_out_32_bit = (is_LW_SW == 1'b0) ? {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]} : { (mem_data_out[3 - (mem_addr % 4)][7] == 1) ? 24'hffffff : 24'b0 , mem_data_out[3 - (mem_addr % 4)]};
+    wire [31:0] temp = 3 - (mem_addr % 4);
+    assign mem_block = temp[1:0];
+    assign mem_data_out_32_bit = (is_LW_SW == 1'b0) ? {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]} : { (mem_data_out[mem_block][7] == 1) ? 24'hffffff : 24'b0 , mem_data_out[mem_block]};
 
     assign rd_data = (mem_to_reg == 1'b1) ? mem_data_out_32_bit : (jump == 2'b10) ? pc + 8 : alu_result;
 
