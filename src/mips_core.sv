@@ -59,8 +59,13 @@ module mips_core(
     reg  [3:0]       stall;
     reg  [3:0]       next_stall;
 
-    wire [31:0] mem_data_out_32_bit;
+    wire [31:0] cache_data_out_32_bit;
     wire [1:0] mem_block;
+    wire hit;
+    wire [7:0]  cache_data_out[0:3];
+    wire [31:0] cache_addr;
+    wire cache_write_en;
+    wire [7:0]  cache_data_in[0:3];
 
     regfile regfile_unit(
         .rs_data(rs_data),
@@ -118,15 +123,29 @@ module mips_core(
         .rs_data(rs_data)
     );
 
+    cache cache_unit(
+        .hit(hit),
+        .cache_data_out(cache_data_out),
+        .mem_data_in(mem_data_in),
+        .mem_write_en(mem_write_en),
+        .cache_addr(cache_addr),
+        .mem_addr(mem_addr),
+        .cache_data_in(cache_data_in),
+        .mem_data_out(mem_data_out),
+        .cache_write_en(cache_write_en),
+        .clk(clk),
+        .rst_b(rst_b)
+    );
+
     assign rs_num = inst[25:21];
     assign rt_num = inst[20:16];
     assign rd_num = (reg_dst == 1'b1) ? inst[15:11] : (jump == 2'b10) ? 5'd31 : rt_num;
 
-    wire [31:0] temp = (mem_addr % 4);
+    wire [31:0] temp = (cache_addr % 4);
     assign mem_block = temp[1:0];
-    assign mem_data_out_32_bit = (is_LB_SB == 1'b0) ? {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]} : { (mem_data_out[mem_block][7] == 1) ? 24'hffffff : 24'b0 , mem_data_out[mem_block]};
+    assign cache_data_out_32_bit = (is_LB_SB == 1'b0) ? {cache_data_out[0], cache_data_out[1], cache_data_out[2], cache_data_out[3]} : { (cache_data_out[mem_block][7] == 1) ? 24'hffffff : 24'b0 , cache_data_out[mem_block]};
 
-    assign rd_data = (mem_to_reg == 1'b1) ? mem_data_out_32_bit : (jump == 2'b10) ? pc + 8 : alu_result;
+    assign rd_data = (mem_to_reg == 1'b1) ? cache_data_out_32_bit : (jump == 2'b10) ? pc + 8 : alu_result;
 
     assign immediate_data = inst[15:0];
     assign sh_amount = inst[10:6]; 
@@ -141,44 +160,48 @@ module mips_core(
     assign inst_addr = pc;
     assign halted = (opcode == 0 && func == 6'b001100) ? 1'b1 : 1'b0;
 
-    assign mem_write_en = mem_write && ((is_LB_SB && stall == 5) || (!is_LB_SB && stall == 0));
-    assign mem_addr = alu_result;
-    assign mem_data_in[0] = (is_LB_SB == 1'b0) ? rt_data[31 -: 8] : (mem_block == 0) ? rt_data[31-24 -: 8]: mem_data_out[0];
-    assign mem_data_in[1] = (is_LB_SB == 1'b0) ? rt_data[31-8 -: 8]: (mem_block == 1) ? rt_data[31-24 -: 8]: mem_data_out[1];
-    assign mem_data_in[2] = (is_LB_SB == 1'b0) ? rt_data[31-16 -: 8]: (mem_block == 2) ? rt_data[31-24 -: 8]: mem_data_out[2];
-    assign mem_data_in[3] = (is_LB_SB == 1'b0) ? rt_data[31-24 -: 8]: (mem_block == 3) ? rt_data[31-24 -: 8]: mem_data_out[3];
+    assign cache_write_en = mem_write && ((is_LB_SB && stall == 5) || (!is_LB_SB && stall == 0));
+    assign cache_addr = alu_result;
+    assign cache_data_in[0] = (is_LB_SB == 1'b0) ? rt_data[31 -: 8] : (mem_block == 0) ? rt_data[31-24 -: 8]: cache_data_out[0];
+    assign cache_data_in[1] = (is_LB_SB == 1'b0) ? rt_data[31-8 -: 8]: (mem_block == 1) ? rt_data[31-24 -: 8]: cache_data_out[1];
+    assign cache_data_in[2] = (is_LB_SB == 1'b0) ? rt_data[31-16 -: 8]: (mem_block == 2) ? rt_data[31-24 -: 8]: cache_data_out[2];
+    assign cache_data_in[3] = (is_LB_SB == 1'b0) ? rt_data[31-24 -: 8]: (mem_block == 3) ? rt_data[31-24 -: 8]: cache_data_out[3];
 
     always_ff @(posedge clk, negedge rst_b) begin
-        // $display("------------------INSTR------------------");
-        // $display("inst=%b\nopcode=%b\npc=%d\na=%h\nb=%h\nalu_res=%h\nrd_data=%h\nalu_src=%b\nimm=%h\nrd_num=%d\ncontrol=%d\nalu_op=%b\nfunc=%b\nnext_pc=%d\n",
-        // inst, opcode, pc, a, b, alu_result, rd_data,alu_src, sign_extend_immediate, rd_num, control, alu_op, func, next_pc);
-        // $display("------------------STALL------------------");
+        $display("------------------INSTR------------------");
+        $display("inst=%b\nopcode=%b\npc=%d\na=%h\nb=%h\nalu_res=%h\nrd_data=%h\nalu_src=%b\nimm=%h\nrd_num=%d\ncontrol=%d\nalu_op=%b\nfunc=%b\nnext_pc=%d\n",
+        inst, opcode, pc, a, b, alu_result, rd_data,alu_src, sign_extend_immediate, rd_num, control, alu_op, func, next_pc);
+        
+        $display("------------------CACHE------------------");
         // $display("mem_read=%b\nmem_write=%b\nmem_write_en=%b\nmem_write_ctrl=%b\nmem_data_out=%h\nstall=%d", 
         // mem_read, mem_write, mem_write_en, mem_write, {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]}, stall);
-        // $display("-----------------------------------------");
+        $display("hit=%b\ncache_data_out=%h\nmem_data_in=%h\nmem_write_en=%b\ncache_addr=%d\nmem_addr=%d\ncache_data_in=%h\nmem_data_out=%h\ncache_write_en=%b\nclk=%b", hit,cache_data_out,mem_data_in,mem_write_en,cache_addr,mem_addr,cache_data_in,mem_data_out,cache_write_en,clk);        
+        $display("-----------------------------------------");
         if (rst_b == 0) begin
             pc <= 0;
             stall <= 0;
         end else begin
-            stall <= next_stall;
-            $display("YO CHECK: stall:%d, next_stall:%d", stall, next_stall);
-            if ((stall == 0 && next_stall != 4 && next_stall != 8) || stall == 1) begin
+            // stall <= next_stall;
+            // $display("YO CHECK: stall:%d, next_stall:%d", stall, next_stall);
+            // if ((stall == 0 && next_stall != 4 && next_stall != 8) || stall == 1) begin
+            //     pc <= next_pc;
+            // end
+            if (hit)
                 pc <= next_pc;
-            end
         end  
     end
 
     always_comb begin
-        next_stall = stall;
-        if ((mem_read || mem_write) && stall == 0) begin
-            if (mem_write && is_LB_SB && stall == 0)
-                next_stall = 8;
-            else
-                next_stall = 4;
-        end  
-        else if (stall > 0) begin 
-            next_stall = stall - 1;
-        end 
+        // next_stall = stall;
+        // if ((mem_read || mem_write) && stall == 0) begin
+        //     if (mem_write && is_LB_SB && stall == 0)
+        //         next_stall = 8;
+        //     else
+        //         next_stall = 4;
+        // end  
+        // else if (stall > 0) begin 
+        //     next_stall = stall - 1;
+        // end 
     end
 
 endmodule
