@@ -179,7 +179,7 @@ module mips_core(
         $display("------------------CACHE------------------");
         // $display("mem_read=%b\nmem_write=%b\nmem_write_en=%b\nmem_write_ctrl=%b\nmem_data_out=%h\nstall=%d", 
         // mem_read, mem_write, mem_write_en, mem_write, {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]}, stall);
-        $display("hit=%b\ncache_data_out=%h\nmem_data_in=%h\nmem_write_en=%b\ncache_addr=%d\nmem_addr=%d\ncache_data_in=%h\nmem_data_out=%h\ncache_write_en=%b\nclkcount=%d", hit,cache_data_out,mem_data_in,mem_write_en,cache_addr,mem_addr,cache_data_in,mem_data_out,cache_write_en,clk_count);        
+        $display("hit=%b\ncache_data_out=%h\nmem_data_in=%h\nmem_write_en=%b\ncache_addr=%d\nmem_addr=%d\ncache_data_in=%h\nmem_data_out=%h\ncache_write_en=%b\ncache_en=%b\nclkcount=%d", hit,{cache_data_out[0],cache_data_out[1],cache_data_out[2],cache_data_out[3]},{mem_data_in[0],mem_data_in[1],mem_data_in[2],mem_data_in[3]},mem_write_en,cache_addr,mem_addr,{cache_data_in[0],cache_data_in[1],cache_data_in[2],cache_data_in[3]},{mem_data_out[0],mem_data_out[1],mem_data_out[2],mem_data_out[3]},cache_write_en,cache_en,clk_count);        
         $display("-----------------------------------------");
         if (rst_b == 0) begin
             pc <= 0;
