@@ -8,6 +8,7 @@ module cache(
     cache_data_in,
     mem_data_out,
     cache_write_en,
+    cache_en,
     clk,
     rst_b
 );
@@ -18,6 +19,7 @@ module cache(
     output reg          hit;
     output reg  [31:0]  mem_addr;
 
+    input          cache_en;
     input  [7:0]   mem_data_out[0:3];
     input  [7:0]   cache_data_in[0:3];
     input          cache_write_en;
@@ -54,7 +56,8 @@ module cache(
                 tag[i] <= 0;
             end
         end
-        else begin
+        else if (cache_en) begin
+            
             if (valid[ea]) begin
                 if (tag[ea] == input_tag) begin
                     hit <= 1;

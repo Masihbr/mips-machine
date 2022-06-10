@@ -66,6 +66,7 @@ module mips_core(
     wire [31:0] cache_addr;
     wire cache_write_en;
     wire [7:0]  cache_data_in[0:3];
+    wire        cache_en;
 
     regfile regfile_unit(
         .rs_data(rs_data),
@@ -93,6 +94,7 @@ module mips_core(
         .do_extend(do_extend),
         .jr(jr),
         .jump(jump),
+        .cache_en(cache_en),
         .func(func),
         .opcode(opcode)
     );
@@ -133,6 +135,7 @@ module mips_core(
         .cache_data_in(cache_data_in),
         .mem_data_out(mem_data_out),
         .cache_write_en(cache_write_en),
+        .cache_en(cache_en),
         .clk(clk),
         .rst_b(rst_b)
     );
@@ -167,6 +170,7 @@ module mips_core(
     assign cache_data_in[2] = (is_LB_SB == 1'b0) ? rt_data[31-16 -: 8]: (mem_block == 2) ? rt_data[31-24 -: 8]: cache_data_out[2];
     assign cache_data_in[3] = (is_LB_SB == 1'b0) ? rt_data[31-24 -: 8]: (mem_block == 3) ? rt_data[31-24 -: 8]: cache_data_out[3];
 
+    integer clk_count;
     always_ff @(posedge clk, negedge rst_b) begin
         $display("------------------INSTR------------------");
         $display("inst=%b\nopcode=%b\npc=%d\na=%h\nb=%h\nalu_res=%h\nrd_data=%h\nalu_src=%b\nimm=%h\nrd_num=%d\ncontrol=%d\nalu_op=%b\nfunc=%b\nnext_pc=%d\n",
@@ -175,18 +179,20 @@ module mips_core(
         $display("------------------CACHE------------------");
         // $display("mem_read=%b\nmem_write=%b\nmem_write_en=%b\nmem_write_ctrl=%b\nmem_data_out=%h\nstall=%d", 
         // mem_read, mem_write, mem_write_en, mem_write, {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]}, stall);
-        $display("hit=%b\ncache_data_out=%h\nmem_data_in=%h\nmem_write_en=%b\ncache_addr=%d\nmem_addr=%d\ncache_data_in=%h\nmem_data_out=%h\ncache_write_en=%b\nclk=%b", hit,cache_data_out,mem_data_in,mem_write_en,cache_addr,mem_addr,cache_data_in,mem_data_out,cache_write_en,clk);        
+        $display("hit=%b\ncache_data_out=%h\nmem_data_in=%h\nmem_write_en=%b\ncache_addr=%d\nmem_addr=%d\ncache_data_in=%h\nmem_data_out=%h\ncache_write_en=%b\nclkcount=%d", hit,cache_data_out,mem_data_in,mem_write_en,cache_addr,mem_addr,cache_data_in,mem_data_out,cache_write_en,clk_count);        
         $display("-----------------------------------------");
         if (rst_b == 0) begin
             pc <= 0;
             stall <= 0;
+            clk_count <=0;
         end else begin
+            clk_count <= clk_count+1;
             // stall <= next_stall;
             // $display("YO CHECK: stall:%d, next_stall:%d", stall, next_stall);
             // if ((stall == 0 && next_stall != 4 && next_stall != 8) || stall == 1) begin
             //     pc <= next_pc;
             // end
-            if (hit)
+            if (!cache_en || hit)
                 pc <= next_pc;
         end  
     end

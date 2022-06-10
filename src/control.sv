@@ -6,6 +6,7 @@ module control(
     reg_write,
     mem_read,
     mem_write,
+    cache_en,
     branch,
     alu_op,
     jr,
@@ -17,6 +18,7 @@ module control(
     parameter OPCODE_LENGTH = 6, FUNCT_LENGTH = 6;
     input [OPCODE_LENGTH-1:0] opcode;
     input [FUNCT_LENGTH-1:0] func;
+    output     cache_en;
     output reg reg_dst;
     output reg [1:0] alu_src; // alu_src[0] => a, alu_src[1] => b
     output reg mem_to_reg;
@@ -29,6 +31,9 @@ module control(
     output reg [1:0]jump;
     output reg do_extend;
     output reg is_LB_SB;
+
+    assign cache_en = (mem_write || mem_read);
+    
     always_comb begin
         reg_dst = 1'b0;
         alu_src = 2'b00;
