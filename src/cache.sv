@@ -48,6 +48,7 @@ module cache(
     integer i;
 
     always_ff @(posedge clk, negedge rst_b) begin
+        $display("ea=%d\ndirty=%b\nvalid=%b\ntag=%h\ninput_tag=%h\ndata=%h", ea,dirty[ea],valid[ea],tag[ea],input_tag,data[ea]);
         if (rst_b == 0) begin
             counter <= 0;
             for (i = start; i <= top; i++) begin
@@ -56,18 +57,22 @@ module cache(
                 tag[i] <= 0;
             end
         end
-        else if (cache_en) begin
-            
+        else if (cache_en) begin   
+            hit <= 0;
             if (valid[ea]) begin
+                $display("valid");
                 if (tag[ea] == input_tag) begin
+                    $display("tag");
                     hit <= 1;
                     counter <= 0;
                 end
                 else begin
+                    $display("not tag");
                     if (dirty[ea] && counter == 0) begin
+                        $display("dirty and counter=0");
                         mem_addr <= {tag[ea], ea, 2'b00};
                         mem_write_en <= 1;
-                        {mem_data_in[3], mem_data_in[2], mem_data_in[1], mem_data_in[0]} = data[ea]; 
+                        {mem_data_in[3], mem_data_in[2], mem_data_in[1], mem_data_in[0]} <= data[ea]; 
 
                         counter <= counter + 1;
                     end else begin
@@ -75,7 +80,7 @@ module cache(
                         mem_write_en <= 0;
 
                         if ((dirty[ea] && counter == 5) || (!dirty[ea] && counter == 4)) begin
-                            data[ea] = {mem_data_out[3], mem_data_out[2], mem_data_out[1], mem_data_out[0]}; 
+                            data[ea] <= {mem_data_out[3], mem_data_out[2], mem_data_out[1], mem_data_out[0]}; 
                             valid[ea] <= 1;
                             dirty[ea] <= 0;
                             tag[ea] <= input_tag;
@@ -88,8 +93,10 @@ module cache(
                 end
             end else begin
                 mem_addr <= cache_addr;
+                hit <= 0;
                 if (counter == 4) begin
-                    data[ea] = {mem_data_out[3], mem_data_out[2], mem_data_out[1], mem_data_out[0]}; 
+
+                    data[ea] <= {mem_data_out[3], mem_data_out[2], mem_data_out[1], mem_data_out[0]}; 
                     valid[ea] <= 1;
                     dirty[ea] <= 0;
                     tag[ea] <= input_tag;
@@ -97,11 +104,13 @@ module cache(
                     counter <= 0;   
                 end else begin
                     counter <= counter + 1;
+                    hit <= 0;
                 end
             end
 
             if (cache_write_en) begin
-                data[ea] = {cache_data_in[3], cache_data_in[2], cache_data_in[1], cache_data_in[0]}; 
+                $display("cache_write_en");
+                data[ea] <= {cache_data_in[3], cache_data_in[2], cache_data_in[1], cache_data_in[0]}; 
                 dirty[ea] <= 1;
             end
         end
