@@ -44,6 +44,7 @@ module ID_to_EXE (
     input [31:0] pc_in;
     input [31:0] inst_in;
     input        reg_dst_in;
+    input        reg_write_in;
     input        clk;
     input        rst_b;
     input        freeze;
@@ -60,6 +61,7 @@ module ID_to_EXE (
     output reg [31:0] pc;
     output reg [31:0] inst;
     output reg        reg_dst;
+    output reg        reg_write;
 
   integer clk_count;
 
