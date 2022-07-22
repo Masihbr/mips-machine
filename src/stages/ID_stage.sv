@@ -1,4 +1,5 @@
 module ID_stage(
+    // outputs
     is_LB_SB,
     reg_dst,
     alu_src,
@@ -16,6 +17,8 @@ module ID_stage(
     control,
     a,
     b,
+    halted,
+    // inputs
     inst,
     rs_data,
     rt_data,
@@ -46,6 +49,8 @@ module ID_stage(
     input [31:0] inst;
     input [31:0] rs_data;
     input [31:0] rt_data;
+    input        clk;
+    input        rst_b;
      
 
     wire [5:0]  opcode;

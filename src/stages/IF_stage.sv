@@ -1,4 +1,7 @@
 module IF_stage(
+    // outputs
+    PC,
+    // inputs
     clk,
     rst_b,
     jump,
@@ -11,11 +14,8 @@ module IF_stage(
     cache_en,
     hit,
     sign_extend_immediate,
-    PC,
 );
     
-    parameter XLEN=32;
-
     input            clk;
     input            rst_b;
     input [1:0]      jump;
@@ -23,7 +23,7 @@ module IF_stage(
     input            jr;
     input            do_extend;
     input            zero;
-    input [XLEN-1:0] rs_data;
+    input [31:0]     rs_data;
     input [31:0]     instruction;
     input            cache_en;
     input            hit;
