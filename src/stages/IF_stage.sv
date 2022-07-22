@@ -1,6 +1,6 @@
 module IF_stage(
     // outputs
-    PC,
+    pc,
     // inputs
     clk,
     rst_b,
@@ -10,7 +10,7 @@ module IF_stage(
     do_extend,
     zero,
     rs_data,
-    instruction,
+    inst,
     cache_en,
     hit,
     sign_extend_immediate,
@@ -24,7 +24,7 @@ module IF_stage(
     input            do_extend;
     input            zero;
     input [31:0]     rs_data;
-    input [31:0]     instruction;
+    input [31:0]     inst;
     input            cache_en;
     input            hit;
     input [31:0]     sign_extend_immediate;
@@ -34,7 +34,7 @@ module IF_stage(
     wire [31:0] next_pc;
     wire [25:0] address;
 
-    assign address = instruction[25:0];
+    assign address = inst[25:0];
 
     pc_control pc_control(
         .next_pc(next_pc),

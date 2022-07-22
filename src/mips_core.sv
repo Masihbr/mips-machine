@@ -72,24 +72,140 @@ module mips_core_old(
     
     IF_stage IF_stage(
         // outputs
-        .PC(PC),
+        .PC(pc_IF),
         // inputs
         .clk(clk),
         .rst_b(rst_b),
-        .jump(jump),
-        .branch(branch),
-        .jr(jr),
-        .do_extend(do_extend),
-        .zero(zero),
-        .rs_data(rs_data),
-        .instruction(instruction),
-        .cache_en(cache_en),
-        .hit(hit),
-        .sign_extend_immediate(sign_extend_immediate),
+        .jump(jump_ID),
+        .branch(branch_ID),
+        .jr(jr_ID),
+        .do_extend(do_extend_ID),
+        .zero(zero_ID),
+        .rs_data(rs_data_ID),
+        .inst(inst),
+        .cache_en(cache_en_ID),
+        .hit(hit_MEM),
+        .sign_extend_immediate(sign_extend_immediate_ID),
     );
 
-    assign rs_num = inst[25:21];
-    assign rt_num = inst[20:16];
+    IF_to_ID IF_to_ID (
+        // outputs
+        .pc(pc_ID),
+        .inst(inst_ID),
+        // outputs
+        .pc_in(pc_IF),
+        .inst_in(inst_IF),
+        .clk(clk),
+        .rst_b(rst_b),
+        .flush(flush_IF),
+        .freeze(~hit_MEM)
+    );
+    
+    assign rs_num = inst_ID[25:21];
+    assign rt_num = inst_ID[20:16];
+
+    ID_stage ID_stage(
+        // outputs
+        .is_LB_SB(is_LB_SB_ID),
+        .reg_dst(reg_dst_ID),
+        .alu_src(alu_src_ID),
+        .mem_to_reg(mem_to_reg_ID),
+        .reg_write(reg_write_ID),
+        .mem_read(mem_read_ID),
+        .mem_write(mem_write_ID),
+        .branch(branch_ID),
+        .alu_op(alu_op_ID),
+        .do_extend(do_extend_ID),
+        .jr(jr_ID),
+        .jump(jump_ID),
+        .cache_en(cache_en_ID),
+        .sign_extend_immediate(sign_extend_immediate_ID),
+        .control(control_ID),
+        .a(a_ID),
+        .b(b_ID),
+        .halted(halted_ID),
+        //inputs
+        .inst(inst_ID),
+        .rs_data(rs_data),
+        .rt_data(rt_data),
+        .clk(clk),
+        .rst_b(rst_b)
+    );
+
+    ID_to_EXE ID_to_EXE(
+        // outputs
+        .a(a_EXE),
+        .b(b_EXE),
+        .control(control_EXE),
+        .mem_write(mem_write_EXE),
+        .alu_result(alu_result_EXE),
+        .is_LB_SB(is_LB_SB_EXE),
+        .rt_data(rt_data_EXE),
+        .mem_data_out(mem_data_out_EXE),
+        .cache_en(cache_en_EXE),
+        .mem_to_reg(mem_to_reg_EXE),
+        .jump(jump_EXE),
+        .pc(pc_EXE),
+        // inputs
+        .a_in(a_ID),
+        .b_in(b_ID),
+        .control_in(control_ID),
+        .mem_write_in(mem_write_ID),
+        .alu_result_in(alu_result_ID),
+        .is_LB_SB_in(is_LB_SB_ID),
+        .rt_data_in(rt_data_ID),
+        .mem_data_out_in(mem_data_out_ID),
+        .cache_en_in(cache_en_ID),
+        .mem_to_reg_in(mem_to_reg_ID),
+        .jump_in(jump_ID),
+        .pc_in(pc_ID),
+        .clk(clk),
+        .rst_b(rst_b),
+        .freeze(~hit_MEM)
+    );
+
+    EXE_stage EXE_stage (
+        // outputs
+        .alu_result(alu_result_EXE),
+        .zero(zero_EXE),
+        // inputs
+        .a(a_EXE),
+        .b(b_EXE),
+        .control(control_EXE)
+    );
+    EXE_to_MEM EXE_to_MEM();
+
+    MEM_stage MEM_stage(
+        // outputs
+        .hit(hit_MEM),
+        .cache_data_out(cache_data_out_MEM),
+        .mem_data_in(mem_data_in_MEM),
+        .mem_write_en(mem_write_en_MEM),
+        .mem_addr(mem_addr_MEM),
+        // inputs
+        .mem_write(mem_write_MEM),
+        .alu_result(alu_result_MEM),
+        .is_LB_SB(is_LB_SB_MEM),
+        .rt_data(rt_data_MEM),
+        .mem_data_out(mem_data_out_MEM),
+        .cache_en(cache_en_MEM),
+        .clk(clk),
+        .rst_b(rst_b)
+    );
+
+    WB_stage WB_stage(
+        // outputs
+        .rd_data(rd_data_WB),
+        // inputs
+        .is_LB_SB(is_LB_SB_WB),
+        .cache_data_out(cache_data_out_WB),
+        .mem_block(mem_block_WB),
+        .mem_to_reg(mem_to_reg_WB),
+        .jump(jump_WB),
+        .pc(pc_WB),
+        .alu_result(alu_result_WB)
+    );
+
     assign rd_num = (reg_dst == 1'b1) ? inst[15:11] : (jump == 2'b10) ? 5'd31 : rt_num;
 
     wire [31:0] temp = (cache_addr % 4);
