@@ -9,6 +9,7 @@ module EXE_to_MEM(
         jump,
         pc,
         inst,
+        reg_dst,
         // inputs
         mem_write_in,
         alu_result_in,
@@ -19,6 +20,7 @@ module EXE_to_MEM(
         jump_in,
         pc_in,
         inst_in,
+        reg_dst_in,
         clk,
         rst_b,
         freeze
@@ -33,6 +35,7 @@ module EXE_to_MEM(
     input [1:0]  jump_in;
     input [31:0] pc_in;
     input [31:0] inst_in;
+    input        reg_dst_in;
     input        clk;
     input        rst_b;
     input        freeze;
@@ -46,6 +49,7 @@ module EXE_to_MEM(
     output reg [1:0]  jump;
     output reg [31:0] pc;
     output reg [31:0] inst;
+    output reg        reg_dst;
 
   integer clk_count;
 
@@ -60,6 +64,7 @@ module EXE_to_MEM(
     $display("jump_in= %b",jump_in);
     $display("pc_in= %b",pc_in);
     $display("inst_in= %b",inst_in);
+    $display("reg_dst_in= %b",reg_dst_in);
     $display("clk= %b",clk);
     $display("rst_b= %b",rst_b);
     $display("freeze= %b",freeze);
@@ -67,7 +72,7 @@ module EXE_to_MEM(
 
     if (!rst_b) begin
       clk_count <= 0;
-      {mem_write, alu_result, is_LB_SB, rt_data, cache_en, mem_to_reg, jump, pc, inst} <= 0;
+      {mem_write, alu_result, is_LB_SB, rt_data, cache_en, mem_to_reg, jump, pc, inst, reg_dst} <= 0;
     end
     else begin
         clk_count <= clk_count + 1;
@@ -81,6 +86,7 @@ module EXE_to_MEM(
                 jump <= jump_in;
                 pc <= pc_in;
                 inst <= inst_in;
+                reg_dst <= reg_dst_in;
         end
     end
   end

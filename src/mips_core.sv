@@ -73,6 +73,8 @@ module mips_core(
     wire [1:0]  jump_EXE;
     wire [31:0] pc_EXE;
     wire [31:0] inst_EXE;
+    wire        reg_dst_EXE;
+    wire        reg_write_EXE;
 
     wire [31:0] alu_result_EXE;
     wire        zero_EXE;
@@ -87,6 +89,7 @@ module mips_core(
     wire [1:0]  jump_MEM;
     wire [31:0] pc_MEM;
     wire [31:0] inst_MEM;
+    wire        reg_dst_MEM;
 
     wire        hit_MEM;
     wire [7:0]  cache_data_out_MEM[0:3];
@@ -104,6 +107,7 @@ module mips_core(
     wire [31:0] pc_WB;
     wire [31:0] alu_result_WB;
     wire [31:0] inst_WB;
+    wire        reg_dst_WB;
 
     wire [31:0] rd_data_WB;  
 
@@ -199,6 +203,7 @@ module mips_core(
         .pc(pc_EXE),
         .inst(inst_EXE)
         .reg_dst(reg_dst_EXE),
+        .reg_write(reg_write_EXE),
         // inputs
         .a_in(a_ID),
         .b_in(b_ID),
@@ -212,6 +217,7 @@ module mips_core(
         .pc_in(pc_ID),
         .inst_in(inst_ID),
         .reg_dst_in(reg_dst_ID),
+        .reg_write_in(reg_write_ID),
         .clk(clk),
         .rst_b(rst_b),
         .freeze(1'b0)
@@ -240,6 +246,8 @@ module mips_core(
         .jump(jump_MEM),
         .pc(pc_MEM),
         .inst(inst_MEM),
+        .reg_dst(reg_dst_MEM),
+        .reg_write()
         // inputs
         .mem_write_in(mem_write_EXE),
         .alu_result_in(alu_result_EXE),
@@ -250,6 +258,7 @@ module mips_core(
         .jump_in(jump_EXE),
         .pc_in(pc_EXE),
         .inst_in(inst_EXE),
+        .reg_dst_in(reg_dst_EXE),
         .clk(clk),
         .rst_b(rst_b),
         .freeze(1'b0)
@@ -284,6 +293,7 @@ module mips_core(
         .pc(pc_WB),
         .alu_result(alu_result_WB),
         .inst(inst_WB),
+        .reg_dst(reg_dst_WB),
         // inputs
         .is_LB_SB_in(is_LB_SB_MEM),
         .cache_data_out_in(cache_data_out_MEM),
@@ -293,6 +303,7 @@ module mips_core(
         .pc_in(pc_MEM),
         .alu_result_in(alu_result_MEM),
         .inst_in(inst_MEM),
+        .reg_dst_in(reg_dst_MEM),
         .clk(clk),
         .rst_b(rst_b),
         .freeze(1'b0)
@@ -315,6 +326,7 @@ module mips_core(
         .pc(pc_WB),
         .alu_result(alu_result_WB),
         .inst(inst_WB),
+        .reg_dst(reg_dst_WB),
         .clk(clk),
         .rst_b(rst_b)
     );

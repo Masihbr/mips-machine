@@ -7,6 +7,8 @@ module MEM_to_WB(
         jump,
         pc,
         alu_result,
+        inst,
+        reg_dst,
         // inputs
         is_LB_SB_in,
         cache_data_out_in,
@@ -15,6 +17,8 @@ module MEM_to_WB(
         jump_in,
         pc_in,
         alu_result_in,
+        inst_in,
+        reg_dst_in,
         clk,
         rst_b,
         freeze
@@ -27,6 +31,8 @@ module MEM_to_WB(
     input [1:0]  jump_in;
     input [31:0] pc_in;
     input [31:0] alu_result_in;   
+    input [31:0] inst_in;   
+    input        reg_dst_in;
     input        clk;
     input        rst_b;
     input        freeze;
@@ -38,6 +44,8 @@ module MEM_to_WB(
     output reg [1:0]  jump;
     output reg [31:0] pc;
     output reg [31:0] alu_result;  
+    output reg [31:0] inst;  
+    output reg        reg_dst;  
 
 integer clk_count;
 always @ (posedge clk, negedge rst_b) begin
@@ -49,6 +57,8 @@ always @ (posedge clk, negedge rst_b) begin
     $display("jump_in= %b", jump_in);
     $display("pc_in= %b", pc_in);
     $display("alu_result_in= %b", alu_result_in);
+    $display("inst_in= %b", inst_in);
+    $display("reg_dst_in= %b", reg_dst_in);
     $display("clk= %b", clk);
     $display("rst_b= %b", rst_b);
     $display("freeze= %b", freeze);
@@ -62,6 +72,8 @@ always @ (posedge clk, negedge rst_b) begin
         jump <= 0;
         pc <= 0;
         alu_result <= 0;
+        inst <= 0;
+        reg_dst <= 0;
     end
     else begin
         clk_count <= clk_count + 1;
@@ -73,6 +85,8 @@ always @ (posedge clk, negedge rst_b) begin
                 jump <= jump_in;
                 pc <= pc_in;
                 alu_result <= alu_result_in;
+                inst <= inst_in;
+                reg_dst <= reg_dst_in;
         end
     end
   end

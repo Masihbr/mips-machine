@@ -9,6 +9,7 @@ module WB_stage(
     pc,
     alu_result,
     inst,
+    reg_dst,
     clk,
     rst_b
 );
@@ -20,6 +21,7 @@ module WB_stage(
     input [31:0] pc;
     input [31:0] alu_result;
     input [31:0] inst;
+    input reg_dst;
     input clk;
     input rst_b;
 
