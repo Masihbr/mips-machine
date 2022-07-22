@@ -90,6 +90,7 @@ module mips_core(
     wire [31:0] pc_MEM;
     wire [31:0] inst_MEM;
     wire        reg_dst_MEM;
+    wire        reg_write_MEM;
 
     wire        hit_MEM;
     wire [7:0]  cache_data_out_MEM[0:3];
@@ -108,6 +109,7 @@ module mips_core(
     wire [31:0] alu_result_WB;
     wire [31:0] inst_WB;
     wire        reg_dst_WB;
+    wire        reg_write_WB;
 
     wire [31:0] rd_data_WB;  
 
@@ -247,7 +249,7 @@ module mips_core(
         .pc(pc_MEM),
         .inst(inst_MEM),
         .reg_dst(reg_dst_MEM),
-        .reg_write()
+        .reg_write(reg_write_MEM),
         // inputs
         .mem_write_in(mem_write_EXE),
         .alu_result_in(alu_result_EXE),
@@ -259,6 +261,7 @@ module mips_core(
         .pc_in(pc_EXE),
         .inst_in(inst_EXE),
         .reg_dst_in(reg_dst_EXE),
+        .reg_write_in(reg_write_EXE),
         .clk(clk),
         .rst_b(rst_b),
         .freeze(1'b0)
@@ -294,6 +297,7 @@ module mips_core(
         .alu_result(alu_result_WB),
         .inst(inst_WB),
         .reg_dst(reg_dst_WB),
+        .reg_write(reg_write_WB),
         // inputs
         .is_LB_SB_in(is_LB_SB_MEM),
         .cache_data_out_in(cache_data_out_MEM),
@@ -304,6 +308,7 @@ module mips_core(
         .alu_result_in(alu_result_MEM),
         .inst_in(inst_MEM),
         .reg_dst_in(reg_dst_MEM),
+        .reg_write_in(reg_write_MEM),
         .clk(clk),
         .rst_b(rst_b),
         .freeze(1'b0)
@@ -311,9 +316,9 @@ module mips_core(
 
     assign rd_data = rd_data_WB;
 
-    assign rd_we = ;
+    assign rd_we = reg_write_WB;
 
-    WB_stage WB_stage(
+    WB_stage WB_stage (
         // outputs
         .rd_data(rd_data_WB),
         .rd_num(rd_num),
