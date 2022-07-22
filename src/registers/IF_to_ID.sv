@@ -18,19 +18,19 @@ module IF_to_ID (
     input        flush;
     input        freeze;
 
-    output [31:0] pc;
-    output [31:0] inst;
+    output reg [31:0] pc;
+    output reg [31:0] inst;
     
     always @ (posedge clk, negedge rst_b) begin
         if (!rst_b) begin
-            PC <= 0;
+            pc <= 0;
             inst <= 0;
         end
         else begin
             if (~freeze) begin
                 if (flush) begin
                     inst <= 0;
-                    PC <= 0;
+                    pc <= 0;
                 end
                 else begin
                     inst <= inst_in;

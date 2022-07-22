@@ -40,16 +40,16 @@ module ID_to_EXE (
     input        rst_b;
     input        freeze;
 
-    output [31:0] a;
-    output [31:0] b;
-    output [3:0]  control;
-    output        mem_write;
-    output        is_LB_SB;
-    output [31:0] rt_data;
-    output        cache_en;
-    output        mem_to_reg;
-    output [1:0]  jump;
-    output [31:0] pc;
+    output reg [31:0] a;
+    output reg [31:0] b;
+    output reg [3:0]  control;
+    output reg        mem_write;
+    output reg        is_LB_SB;
+    output reg [31:0] rt_data;
+    output reg        cache_en;
+    output reg        mem_to_reg;
+    output reg [1:0]  jump;
+    output reg [31:0] pc;
 
   always @ (posedge clk, negedge rst_b) begin
     if (!rst_b) begin

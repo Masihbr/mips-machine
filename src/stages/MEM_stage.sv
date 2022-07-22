@@ -31,7 +31,7 @@ module MEM_stage(
     output [7:0]  mem_data_in[0:3];
     output        mem_write_en;
     output [31:0] mem_addr;
-    output [1:0]  mem_blcok;
+    output [1:0]  mem_block;
 
     wire        cache_write_en;
     wire [31:0] cache_addr;

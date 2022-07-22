@@ -93,9 +93,11 @@ module mips_core(
     wire [7:0]  mem_data_in_MEM[0:3];
     wire        mem_write_en_MEM;
     wire [31:0] mem_addr_MEM;
+    assign mem_addr = mem_addr_MEM;
+    wire [1:0]  mem_block_MEM;
 
     wire        is_LB_SB_WB;
-    wire [31:0] cache_data_out_WB;
+    wire [7:0]  cache_data_out_WB[0:3];
     wire [1:0]  mem_block_WB;
     wire        mem_to_reg_WB;
     wire [1:0]  jump_WB;
@@ -104,6 +106,8 @@ module mips_core(
 
     wire [31:0] rd_data_WB;  
 
+    assign halted = halted_ID;
+
     regfile regfile_unit(
         .rs_data(rs_data),
         .rt_data(rt_data),
@@ -111,7 +115,7 @@ module mips_core(
         .rt_num(rt_num),
         .rd_num(rd_num),
         .rd_data(rd_data),
-        .rd_we(reg_write),
+        .rd_we(reg_write_ID),
         .clk(clk),
         .rst_b(rst_b),
         .halted(halted)
@@ -119,7 +123,7 @@ module mips_core(
     
     IF_stage IF_stage(
         // outputs
-        .PC(pc_IF),
+        .pc(pc_IF),
         // inputs
         .clk(clk),
         .rst_b(rst_b),
@@ -132,7 +136,7 @@ module mips_core(
         .inst(inst),
         .cache_en(cache_en_ID),
         .hit(hit_MEM),
-        .sign_extend_immediate(sign_extend_immediate_ID),
+        .sign_extend_immediate(sign_extend_immediate_ID)
     ); 
 
     IF_to_ID IF_to_ID (
@@ -293,16 +297,7 @@ module mips_core(
         .jump(jump_WB),
         .pc(pc_WB),
         .alu_result(alu_result_WB)
-    );  // wires
+    );
 
-    integer clk_count;
-    always_ff @(posedge clk, negedge rst_b) begin
-        if (rst_b == 0) begin
-            pc <= 0;
-            clk_count <=0;
-        end else begin
-            clk_count <= clk_count+1;
-        end  
-    end
 
 endmodule

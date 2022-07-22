@@ -13,7 +13,7 @@ module IF_stage(
     inst,
     cache_en,
     hit,
-    sign_extend_immediate,
+    sign_extend_immediate
 );
     
     input            clk;
@@ -49,12 +49,14 @@ module IF_stage(
     );
 
     always_ff @(posedge clk, negedge rst_b) begin
+        $display("inst=%b\n", inst);
+        
         if (rst_b == 0) begin
             pc <= 0;
         end
         else begin
             if (!cache_en || hit)
-                pc <= next_pc;
+                pc <= next_pc;           
         end
     end
 

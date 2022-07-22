@@ -34,14 +34,14 @@ module EXE_to_MEM(
     input        rst_b;
     input        freeze;
 
-    output        mem_write;
-    output [31:0] alu_result;
-    output        is_LB_SB;
-    output [31:0] rt_data;
-    output        cache_en;
-    output        mem_to_reg;
-    output [1:0]  jump;
-    output [31:0] pc;
+    output reg        mem_write;
+    output reg [31:0] alu_result;
+    output reg        is_LB_SB;
+    output reg [31:0] rt_data;
+    output reg        cache_en;
+    output reg        mem_to_reg;
+    output reg [1:0]  jump;
+    output reg [31:0] pc;
 
 always @ (posedge clk, negedge rst_b) begin
     if (!rst_b) begin
