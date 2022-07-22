@@ -29,7 +29,6 @@ module mips_core(
     wire [XLEN-1:0]  rd_data;
     wire             clk;
     wire             rst_b;
-    wire             halted;
     
     wire [31:0] pc_IF;
     wire [1:0]  jump_ID;
@@ -39,7 +38,6 @@ module mips_core(
     wire        zero_ID;
     wire [31:0] rs_data_ID;
     wire        cache_en_ID;
-    wire        hit_MEM;
     wire [31:0] sign_extend_immediate_ID;
 
     wire [31:0] pc_ID;
@@ -74,6 +72,7 @@ module mips_core(
     wire        mem_to_reg_EXE;
     wire [1:0]  jump_EXE;
     wire [31:0] pc_EXE;
+    wire [31:0] inst_EXE;
 
     wire [31:0] alu_result_EXE;
     wire        zero_EXE;
@@ -87,6 +86,7 @@ module mips_core(
     wire        mem_to_reg_MEM;
     wire [1:0]  jump_MEM;
     wire [31:0] pc_MEM;
+    wire [31:0] inst_MEM;
 
     wire        hit_MEM;
     wire [7:0]  cache_data_out_MEM[0:3];
@@ -103,10 +103,12 @@ module mips_core(
     wire [1:0]  jump_WB;
     wire [31:0] pc_WB;
     wire [31:0] alu_result_WB;
+    wire [31:0] inst_WB;
 
     wire [31:0] rd_data_WB;  
 
     assign halted = halted_ID;
+    assign inst_addr = pc_IF;
 
     regfile regfile_unit(
         .rs_data(rs_data),
@@ -149,7 +151,7 @@ module mips_core(
         .clk(clk),
         .rst_b(rst_b),
         .flush(flush_IF),
-        .freeze(~hit_MEM)
+        .freeze(1'b0)
     );
     
     assign rs_num = inst_ID[25:21];
@@ -195,6 +197,8 @@ module mips_core(
         .rt_data(rt_data_EXE),
         .cache_en(cache_en_EXE),
         .pc(pc_EXE),
+        .inst(inst_EXE)
+        .reg_dst(reg_dst_EXE),
         // inputs
         .a_in(a_ID),
         .b_in(b_ID),
@@ -206,9 +210,11 @@ module mips_core(
         .rt_data_in(rt_data),
         .cache_en_in(cache_en_ID),
         .pc_in(pc_ID),
+        .inst_in(inst_ID),
+        .reg_dst_in(reg_dst_ID),
         .clk(clk),
         .rst_b(rst_b),
-        .freeze(~hit_MEM)
+        .freeze(1'b0)
     ); 
 
     EXE_stage EXE_stage (
@@ -218,7 +224,9 @@ module mips_core(
         // inputs
         .a(a_EXE),
         .b(b_EXE),
-        .control(control_EXE)
+        .control(control_EXE),
+        .clk(clk),
+        .rst_b(rst_b)
     ); 
 
     EXE_to_MEM EXE_to_MEM(
@@ -231,6 +239,7 @@ module mips_core(
         .mem_to_reg(mem_to_reg_MEM),
         .jump(jump_MEM),
         .pc(pc_MEM),
+        .inst(inst_MEM),
         // inputs
         .mem_write_in(mem_write_EXE),
         .alu_result_in(alu_result_EXE),
@@ -240,9 +249,10 @@ module mips_core(
         .mem_to_reg_in(mem_to_reg_EXE),
         .jump_in(jump_EXE),
         .pc_in(pc_EXE),
+        .inst_in(inst_EXE),
         .clk(clk),
         .rst_b(rst_b),
-        .freeze(~hit_MEM)
+        .freeze(1'b0)
     ); 
 
     MEM_stage MEM_stage(
@@ -273,6 +283,7 @@ module mips_core(
         .jump(jump_WB),
         .pc(pc_WB),
         .alu_result(alu_result_WB),
+        .inst(inst_WB),
         // inputs
         .is_LB_SB_in(is_LB_SB_MEM),
         .cache_data_out_in(cache_data_out_MEM),
@@ -281,14 +292,20 @@ module mips_core(
         .jump_in(jump_MEM),
         .pc_in(pc_MEM),
         .alu_result_in(alu_result_MEM),
+        .inst_in(inst_MEM),
         .clk(clk),
         .rst_b(rst_b),
-        .freeze(~hit_MEM)
+        .freeze(1'b0)
     );
+
+    assign rd_data = rd_data_WB;
+
+    assign rd_we = ;
 
     WB_stage WB_stage(
         // outputs
         .rd_data(rd_data_WB),
+        .rd_num(rd_num),
         // inputs
         .is_LB_SB(is_LB_SB_WB),
         .cache_data_out(cache_data_out_WB),
@@ -296,8 +313,20 @@ module mips_core(
         .mem_to_reg(mem_to_reg_WB),
         .jump(jump_WB),
         .pc(pc_WB),
-        .alu_result(alu_result_WB)
+        .alu_result(alu_result_WB),
+        .inst(inst_WB),
+        .clk(clk),
+        .rst_b(rst_b)
     );
+
+    // integer clk_count;
+    // always_ff @(posedge clk, negedge rst_b) begin
+    //     $display("***************CLK COUNT = %d*****************", clk_count);
+    //     if (!rst_b)
+    //         clk_count <= 0;
+    //     else
+    //         clk_count <= clk_count + 1;
+    // end
 
 
 endmodule

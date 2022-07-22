@@ -8,6 +8,7 @@ module EXE_to_MEM(
         mem_to_reg,
         jump,
         pc,
+        inst,
         // inputs
         mem_write_in,
         alu_result_in,
@@ -17,6 +18,7 @@ module EXE_to_MEM(
         mem_to_reg_in,
         jump_in,
         pc_in,
+        inst_in,
         clk,
         rst_b,
         freeze
@@ -30,6 +32,7 @@ module EXE_to_MEM(
     input        mem_to_reg_in;
     input [1:0]  jump_in;
     input [31:0] pc_in;
+    input [31:0] inst_in;
     input        clk;
     input        rst_b;
     input        freeze;
@@ -42,12 +45,32 @@ module EXE_to_MEM(
     output reg        mem_to_reg;
     output reg [1:0]  jump;
     output reg [31:0] pc;
+    output reg [31:0] inst;
 
-always @ (posedge clk, negedge rst_b) begin
+  integer clk_count;
+
+  always @ (posedge clk, negedge rst_b) begin
+    $display("------------------EXE TO MEM(%d)--------------", clk_count);
+    $display("mem_write_in= %b",mem_write_in);
+    $display("alu_result_in= %b",alu_result_in);
+    $display("is_LB_SB_in= %b",is_LB_SB_in);
+    $display("rt_data_in= %b",rt_data_in);
+    $display("cache_en_in= %b",cache_en_in);
+    $display("mem_to_reg_in= %b",mem_to_reg_in);
+    $display("jump_in= %b",jump_in);
+    $display("pc_in= %b",pc_in);
+    $display("inst_in= %b",inst_in);
+    $display("clk= %b",clk);
+    $display("rst_b= %b",rst_b);
+    $display("freeze= %b",freeze);
+
+
     if (!rst_b) begin
-      {mem_write, alu_result, is_LB_SB, rt_data, cache_en, mem_to_reg, jump, pc} <= 0;
+      clk_count <= 0;
+      {mem_write, alu_result, is_LB_SB, rt_data, cache_en, mem_to_reg, jump, pc, inst} <= 0;
     end
     else begin
+        clk_count <= clk_count + 1;
         if (~freeze) begin
                 mem_write <= mem_write_in;
                 alu_result <= alu_result_in;
@@ -57,18 +80,9 @@ always @ (posedge clk, negedge rst_b) begin
                 mem_to_reg <= mem_to_reg_in;
                 jump <= jump_in;
                 pc <= pc_in;
+                inst <= inst_in;
         end
     end
   end
 
 endmodule
-
-// EXE_to_MEM:
-//     - mem_write
-//     - alu_result
-//     - is_LB_SB
-//     - rt_data
-//     - cache_en
-//     - mem_to_reg
-//     - jump
-//     - pc

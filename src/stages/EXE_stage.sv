@@ -3,12 +3,15 @@ module EXE_stage(
     zero,
     a,
     b,
-    control
+    control,
+    clk, 
+    rst_b
 );
 
     input [31:0] a;
     input [31:0] b;
     input [3:0]  control;
+    input clk, rst_b;
 
     output [31:0] alu_result;
     output        zero;
@@ -22,4 +25,17 @@ module EXE_stage(
         .b(b),
         .control(control)
     );
+    integer clk_count;
+
+    always_ff @(posedge clk, negedge rst_b) begin
+        if(!rst_b)
+            clk_count <= 0;
+        else begin
+            clk_count <= clk_count + 1;
+            $display("-----------------EXE stage(%d)-------------------", clk_count);
+            $display("alu_result=%b",alu_result);
+            $display("zero=%b",zero);
+        end
+    end
+    
 endmodule

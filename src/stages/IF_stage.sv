@@ -47,14 +47,19 @@ module IF_stage(
         .sign_extend_immediate(sign_extend_immediate),
         .rs_data(rs_data)
     );
-
+    integer clk_count;
     always_ff @(posedge clk, negedge rst_b) begin
-        $display("inst=%b\n", inst);
+        $display("-----------------IF stage(%d)-------------------", clk_count);
+        $display("inst=%b", inst);
+        $display("pc= %b", pc);
+        $display("next_pc= %b", next_pc);
         
         if (rst_b == 0) begin
+            clk_count <= 0;
             pc <= 0;
         end
         else begin
+            clk_count <= clk_count + 1;
             if (!cache_en || hit)
                 pc <= next_pc;           
         end

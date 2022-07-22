@@ -39,8 +39,22 @@ module MEM_to_WB(
     output reg [31:0] pc;
     output reg [31:0] alu_result;  
 
+integer clk_count;
 always @ (posedge clk, negedge rst_b) begin
+    $display("------------------MEM TO WB(%d)--------------", clk_count);
+    $display("is_LB_SB_in= %b", is_LB_SB_in);
+    $display("cache_data_out_in= %b", cache_data_out_in);
+    $display("mem_block_in= %b", mem_block_in);
+    $display("mem_to_reg_in= %b", mem_to_reg_in);
+    $display("jump_in= %b", jump_in);
+    $display("pc_in= %b", pc_in);
+    $display("alu_result_in= %b", alu_result_in);
+    $display("clk= %b", clk);
+    $display("rst_b= %b", rst_b);
+    $display("freeze= %b", freeze);
+
     if (!rst_b) begin
+        clk_count <= 0;
         is_LB_SB <= 0;  
         {cache_data_out[0], cache_data_out[1], cache_data_out[2], cache_data_out[3]} <= 0;
         mem_block <= 0;
@@ -50,6 +64,7 @@ always @ (posedge clk, negedge rst_b) begin
         alu_result <= 0;
     end
     else begin
+        clk_count <= clk_count + 1;
         if (~freeze) begin
                 is_LB_SB <= is_LB_SB_in;
                 cache_data_out <= cache_data_out_in;
@@ -63,13 +78,3 @@ always @ (posedge clk, negedge rst_b) begin
   end
 
 endmodule
-
-// EXE_to_MEM:
-//     - mem_write
-//     - alu_result
-//     - is_LB_SB
-//     - rt_data
-//     - cache_en
-//     - mem_to_reg
-//     - jump
-//     - pc

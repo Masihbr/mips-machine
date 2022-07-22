@@ -97,5 +97,34 @@ module ID_stage(
         .alu_op(alu_op),
         .func(func)
     );
+
+    integer clk_count;
+    always_ff @(posedge clk, negedge rst_b) begin
+        if (!rst_b)
+            clk_count <= 0;
+        else begin
+            clk_count <= clk_count + 1;
+
+            $display("-----------------Id stage(%d)-------------------", clk_count);
+            $display("is_LB_SB=%b", is_LB_SB);
+            $display("reg_dst=%b", reg_dst);
+            $display("alu_src=%b", alu_src);
+            $display("mem_to_reg=%b", mem_to_reg);
+            $display("reg_write=%b", reg_write);
+            $display("mem_read=%b", mem_read);
+            $display("mem_write=%b", mem_write);
+            $display("branch=%b", branch);
+            $display("alu_op=%b", alu_op);
+            $display("do_extend=%b", do_extend);
+            $display("jr=%b", jr);
+            $display("jump=%b", jump);
+            $display("cache_en=%b", cache_en);
+            $display("sign_extend_immediate=%b", sign_extend_immediate);
+            $display("control=%b", control);
+            $display("a=%b", a);
+            $display("b=%b", b);
+            $display("halted=%b", halted);
+        end
+    end
     
 endmodule
