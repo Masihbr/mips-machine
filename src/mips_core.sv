@@ -100,7 +100,9 @@ module mips_core(
     wire        mem_to_reg_WB;
     wire [1:0]  jump_WB;
     wire [31:0] pc_WB;
-    wire [31:0] alu_result_WB;  
+    wire [31:0] alu_result_WB;
+
+    wire [31:0] rd_data_WB;  
 
     regfile regfile_unit(
         .rs_data(rs_data),
@@ -278,7 +280,7 @@ module mips_core(
         .clk(clk),
         .rst_b(rst_b),
         .freeze(~hit_MEM)
-    ); // wires
+    );
 
     WB_stage WB_stage(
         // outputs
@@ -291,7 +293,7 @@ module mips_core(
         .jump(jump_WB),
         .pc(pc_WB),
         .alu_result(alu_result_WB)
-    );
+    );  // wires
 
     integer clk_count;
     always_ff @(posedge clk, negedge rst_b) begin

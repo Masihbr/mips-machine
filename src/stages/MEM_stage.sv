@@ -1,9 +1,12 @@
 module MEM_stage(
+    // outputs
     hit,
     cache_data_out,
     mem_data_in,
     mem_write_en,
     mem_addr,
+    mem_block,
+    // inputs
     mem_write,
     alu_result,
     is_LB_SB,
@@ -28,10 +31,10 @@ module MEM_stage(
     output [7:0]  mem_data_in[0:3];
     output        mem_write_en;
     output [31:0] mem_addr;
+    output [1:0]  mem_blcok;
 
     wire        cache_write_en;
     wire [31:0] cache_addr;
-    wire [1:0]  mem_block;
     wire [7:0]  cache_data_in[0:3];
 
     assign cache_write_en = mem_write;
