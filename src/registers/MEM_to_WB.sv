@@ -35,7 +35,7 @@ module MEM_to_WB(
     input [31:0] alu_result_in;   
     input [31:0] inst_in;   
     input        reg_dst_in;
-    input        reg_write;
+    input        reg_write_in;
     input        clk;
     input        rst_b;
     input        freeze;

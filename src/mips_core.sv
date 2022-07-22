@@ -123,7 +123,7 @@ module mips_core(
         .rt_num(rt_num),
         .rd_num(rd_num),
         .rd_data(rd_data),
-        .rd_we(reg_write_ID),
+        .rd_we(reg_write_WB),
         .clk(clk),
         .rst_b(rst_b),
         .halted(halted)
@@ -203,7 +203,7 @@ module mips_core(
         .rt_data(rt_data_EXE),
         .cache_en(cache_en_EXE),
         .pc(pc_EXE),
-        .inst(inst_EXE)
+        .inst(inst_EXE),
         .reg_dst(reg_dst_EXE),
         .reg_write(reg_write_EXE),
         // inputs
@@ -315,8 +315,6 @@ module mips_core(
     );
 
     assign rd_data = rd_data_WB;
-
-    assign rd_we = reg_write_WB;
 
     WB_stage WB_stage (
         // outputs

@@ -76,7 +76,7 @@ module EXE_to_MEM(
 
     if (!rst_b) begin
       clk_count <= 0;
-      {mem_write, alu_result, is_LB_SB, rt_data, cache_en, mem_to_reg, jump, pc, inst, reg_dst, reg_write_in} <= 0;
+      {mem_write, alu_result, is_LB_SB, rt_data, cache_en, mem_to_reg, jump, pc, inst, reg_dst, reg_write} <= 0;
     end
     else begin
       clk_count <= clk_count + 1;
