@@ -113,7 +113,6 @@ module mips_core(
 
     wire [31:0] rd_data_WB;  
 
-    assign halted = halted_ID;
     assign inst_addr = pc_IF;
 
     regfile regfile_unit(
@@ -128,7 +127,7 @@ module mips_core(
         .rst_b(rst_b),
         .halted(halted)
     );
-    
+
     IF_stage IF_stage(
         // outputs
         .pc(pc_IF),
@@ -320,6 +319,7 @@ module mips_core(
         // outputs
         .rd_data(rd_data_WB),
         .rd_num(rd_num),
+        .halted(halted),
         // inputs
         .is_LB_SB(is_LB_SB_WB),
         .cache_data_out(cache_data_out_WB),
