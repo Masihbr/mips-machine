@@ -12,6 +12,7 @@ module ID_to_EXE (
     pc,
     inst,
     reg_dst,
+    reg_write,
     // inputs
     a_in,
     b_in,
@@ -25,6 +26,7 @@ module ID_to_EXE (
     pc_in,
     inst_in,
     reg_dst_in,
+    reg_write_in,
     clk,
     rst_b,
     freeze
@@ -75,13 +77,14 @@ module ID_to_EXE (
     $display("pc_in= %b", pc_in);
     $display("inst_in= %b", inst_in);
     $display("reg_dst_in= %b", reg_dst_in);
+    $display("reg_write_in= %b", reg_write_in);
     $display("clk= %b", clk);
     $display("rst_b= %b", rst_b);
     $display("freeze= %b", freeze);
 
     if (!rst_b) begin
       clk_count <= 0;
-      {a, b, control, is_LB_SB, mem_to_reg, jump, mem_write, rt_data, cache_en, pc, inst, reg_dst} <= 0;
+      {a, b, control, is_LB_SB, mem_to_reg, jump, mem_write, rt_data, cache_en, pc, inst, reg_dst, reg_write} <= 0;
     end
     else begin
       clk_count <= clk_count + 1;
@@ -98,6 +101,7 @@ module ID_to_EXE (
             pc <= pc_in;
             inst <= inst_in;
             reg_dst <= reg_dst_in;
+            reg_write <= reg_write_in;
         end
     end
   end
