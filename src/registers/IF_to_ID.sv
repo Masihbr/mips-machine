@@ -22,7 +22,7 @@ module IF_to_ID (
     output [31:0] inst;
     
     always @ (posedge clk, negedge rst_b) begin
-        if (rst_b) begin
+        if (!rst_b) begin
             PC <= 0;
             inst <= 0;
         end

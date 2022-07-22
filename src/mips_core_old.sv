@@ -1,4 +1,4 @@
-module mips_core(
+module mips_core_old(
     inst_addr,
     inst,
     mem_addr,

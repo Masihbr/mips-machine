@@ -1,4 +1,4 @@
-module mips_core_old(
+module mips_core(
     inst_addr,
     inst,
     mem_addr,
@@ -30,32 +30,77 @@ module mips_core_old(
     wire             clk;
     wire             rst_b;
     wire             halted;
-    wire             reg_dst;
-    wire [1:0]       alu_src;
-    wire             mem_to_reg;
-    wire             reg_write;
-    wire             mem_read;
-    wire             mem_write;
-    wire             is_LB_SB;
-    wire [2:0]       branch;
-    wire [3:0]       alu_op;
-    wire             jr;
-    wire [1:0]       jump;
-    wire             do_extend;
-    wire [3:0]       control;
-    wire [31:0]      alu_result;
-    wire             zero;
-    wire [31:0]      a;
-    wire [31:0]      b;
-    reg  [31:0]      pc;
+    
+    wire [31:0] pc_IF;
+    wire [1:0]  jump_ID;
+    wire [2:0]  branch_ID;
+    wire        jr_ID;
+    wire        do_extend_ID;
+    wire        zero_ID;
+    wire [31:0] rs_data_ID;
+    wire        cache_en_ID;
+    wire        hit_MEM;
+    wire [31:0] sign_extend_immediate_ID;
 
-    wire [31:0] cache_data_out_32_bit;
-    wire [1:0] mem_block;
-    wire hit;
-    wire [7:0]  cache_data_out[0:3];
-    wire [31:0] cache_addr;
-    wire [7:0]  cache_data_in[0:3];
-    wire        cache_en;
+    wire [31:0] pc_ID;
+    wire [31:0] inst_ID;
+
+    wire        flush_IF;
+
+    wire        is_LB_SB_ID;
+    wire        reg_dst_ID;
+    wire [1:0]  alu_src_ID;
+    wire        mem_to_reg_ID;
+    wire        reg_write_ID;
+    wire        mem_read_ID;
+    wire        mem_write_ID;
+    wire [2:0]  branch_ID;
+    wire [3:0]  alu_op_ID;
+    wire        do_extend_ID;
+    wire        jr_ID;
+    wire [31:0] sign_extend_immediate_ID;
+    wire [3:0]  control_ID;
+    wire [31:0] a_ID;
+    wire [31:0] b_ID;
+    wire        halted_ID;
+
+    wire [31:0] a_EXE;
+    wire [31:0] b_EXE;
+    wire [3:0]  control_EXE;
+    wire        mem_write_EXE;
+    wire        is_LB_SB_EXE;
+    wire [31:0] rt_data_EXE;
+    wire        cache_en_EXE;
+    wire        mem_to_reg_EXE;
+    wire [1:0]  jump_EXE;
+    wire [31:0] pc_EXE;
+
+    wire [31:0] alu_result_EXE;
+    wire        zero_EXE;
+
+
+    wire        mem_write_MEM;
+    wire [31:0] alu_result_MEM;
+    wire        is_LB_SB_MEM;
+    wire [31:0] rt_data_MEM;
+    wire        cache_en_MEM;
+    wire        mem_to_reg_MEM;
+    wire [1:0]  jump_MEM;
+    wire [31:0] pc_MEM;
+
+    wire        hit_MEM;
+    wire [7:0]  cache_data_out_MEM[0:3];
+    wire [7:0]  mem_data_in_MEM[0:3];
+    wire        mem_write_en_MEM;
+    wire [31:0] mem_addr_MEM;
+
+    wire        is_LB_SB_WB;
+    wire [31:0] cache_data_out_WB;
+    wire [1:0]  mem_block_WB;
+    wire        mem_to_reg_WB;
+    wire [1:0]  jump_WB;
+    wire [31:0] pc_WB;
+    wire [31:0] alu_result_WB;  
 
     regfile regfile_unit(
         .rs_data(rs_data),
@@ -86,15 +131,15 @@ module mips_core_old(
         .cache_en(cache_en_ID),
         .hit(hit_MEM),
         .sign_extend_immediate(sign_extend_immediate_ID),
-    );
+    ); 
 
     IF_to_ID IF_to_ID (
         // outputs
         .pc(pc_ID),
         .inst(inst_ID),
-        // outputs
+        // inputs
         .pc_in(pc_IF),
-        .inst_in(inst_IF),
+        .inst_in(inst),
         .clk(clk),
         .rst_b(rst_b),
         .flush(flush_IF),
@@ -130,39 +175,35 @@ module mips_core_old(
         .rt_data(rt_data),
         .clk(clk),
         .rst_b(rst_b)
-    );
+    ); 
 
     ID_to_EXE ID_to_EXE(
         // outputs
         .a(a_EXE),
         .b(b_EXE),
         .control(control_EXE),
-        .mem_write(mem_write_EXE),
-        .alu_result(alu_result_EXE),
         .is_LB_SB(is_LB_SB_EXE),
-        .rt_data(rt_data_EXE),
-        .mem_data_out(mem_data_out_EXE),
-        .cache_en(cache_en_EXE),
         .mem_to_reg(mem_to_reg_EXE),
         .jump(jump_EXE),
+        .mem_write(mem_write_EXE),
+        .rt_data(rt_data_EXE),
+        .cache_en(cache_en_EXE),
         .pc(pc_EXE),
         // inputs
         .a_in(a_ID),
         .b_in(b_ID),
         .control_in(control_ID),
-        .mem_write_in(mem_write_ID),
-        .alu_result_in(alu_result_ID),
         .is_LB_SB_in(is_LB_SB_ID),
-        .rt_data_in(rt_data_ID),
-        .mem_data_out_in(mem_data_out_ID),
-        .cache_en_in(cache_en_ID),
         .mem_to_reg_in(mem_to_reg_ID),
         .jump_in(jump_ID),
+        .mem_write_in(mem_write_ID),
+        .rt_data_in(rt_data),
+        .cache_en_in(cache_en_ID),
         .pc_in(pc_ID),
         .clk(clk),
         .rst_b(rst_b),
         .freeze(~hit_MEM)
-    );
+    ); 
 
     EXE_stage EXE_stage (
         // outputs
@@ -172,8 +213,31 @@ module mips_core_old(
         .a(a_EXE),
         .b(b_EXE),
         .control(control_EXE)
-    );
-    EXE_to_MEM EXE_to_MEM();
+    ); 
+
+    EXE_to_MEM EXE_to_MEM(
+        // outputs
+        .mem_write(mem_write_MEM),
+        .alu_result(alu_result_MEM),
+        .is_LB_SB(is_LB_SB_MEM),
+        .rt_data(rt_data_MEM),
+        .cache_en(cache_en_MEM),
+        .mem_to_reg(mem_to_reg_MEM),
+        .jump(jump_MEM),
+        .pc(pc_MEM),
+        // inputs
+        .mem_write_in(mem_write_EXE),
+        .alu_result_in(alu_result_EXE),
+        .is_LB_SB_in(is_LB_SB_EXE),
+        .rt_data_in(rt_data_EXE),
+        .cache_en_in(cache_en_EXE),
+        .mem_to_reg_in(mem_to_reg_EXE),
+        .jump_in(jump_EXE),
+        .pc_in(pc_EXE),
+        .clk(clk),
+        .rst_b(rst_b),
+        .freeze(~hit_MEM)
+    ); 
 
     MEM_stage MEM_stage(
         // outputs
@@ -182,16 +246,39 @@ module mips_core_old(
         .mem_data_in(mem_data_in_MEM),
         .mem_write_en(mem_write_en_MEM),
         .mem_addr(mem_addr_MEM),
+        .mem_block(mem_block_MEM),
         // inputs
         .mem_write(mem_write_MEM),
         .alu_result(alu_result_MEM),
         .is_LB_SB(is_LB_SB_MEM),
         .rt_data(rt_data_MEM),
-        .mem_data_out(mem_data_out_MEM),
+        .mem_data_out(mem_data_out),
         .cache_en(cache_en_MEM),
         .clk(clk),
         .rst_b(rst_b)
-    );
+    ); 
+
+    MEM_to_WB MEM_to_WB(
+        // outputs
+        .is_LB_SB(is_LB_SB_WB),
+        .cache_data_out(cache_data_out_WB),
+        .mem_block(mem_block_WB),
+        .mem_to_reg(mem_to_reg_WB),
+        .jump(jump_WB),
+        .pc(pc_WB),
+        .alu_result(alu_result_WB),
+        // inputs
+        .is_LB_SB_in(is_LB_SB_MEM),
+        .cache_data_out_in(cache_data_out_MEM),
+        .mem_block_in(mem_block_MEM),
+        .mem_to_reg_in(mem_to_reg_MEM),
+        .jump_in(jump_MEM),
+        .pc_in(pc_MEM),
+        .alu_result_in(alu_result_MEM),
+        .clk(clk),
+        .rst_b(rst_b),
+        .freeze(~hit_MEM)
+    ); // wires
 
     WB_stage WB_stage(
         // outputs
@@ -205,19 +292,6 @@ module mips_core_old(
         .pc(pc_WB),
         .alu_result(alu_result_WB)
     );
-
-    assign rd_num = (reg_dst == 1'b1) ? inst[15:11] : (jump == 2'b10) ? 5'd31 : rt_num;
-
-    wire [31:0] temp = (cache_addr % 4);
-    assign mem_block = temp[1:0];
-
-    assign inst_addr = pc;
-
-    assign cache_addr = alu_result;
-    assign cache_data_in[0] = (is_LB_SB == 1'b0) ? rt_data[31 -: 8] : (mem_block == 0) ? rt_data[31-24 -: 8]: cache_data_out[0];
-    assign cache_data_in[1] = (is_LB_SB == 1'b0) ? rt_data[31-8 -: 8]: (mem_block == 1) ? rt_data[31-24 -: 8]: cache_data_out[1];
-    assign cache_data_in[2] = (is_LB_SB == 1'b0) ? rt_data[31-16 -: 8]: (mem_block == 2) ? rt_data[31-24 -: 8]: cache_data_out[2];
-    assign cache_data_in[3] = (is_LB_SB == 1'b0) ? rt_data[31-24 -: 8]: (mem_block == 3) ? rt_data[31-24 -: 8]: cache_data_out[3];
 
     integer clk_count;
     always_ff @(posedge clk, negedge rst_b) begin
