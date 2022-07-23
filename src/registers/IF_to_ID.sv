@@ -23,17 +23,18 @@ module IF_to_ID (
     
     integer clk_count;
     always @ (posedge clk, negedge rst_b) begin
-        $display("-------------IF TO ID(%d)-------------", clk_count);
-        $display("inst_in= %b", inst_in);
-        $display("pc_in= %b", pc_in);
-        $display("freeze= %b", freeze);
-        $display("flush= %b", flush);
-        if (!rst_b) begin
+        if (!rst_b || inst_in == 0) begin
             pc <= 0;
             inst <= 0;
             clk_count <= 0;
         end
         else begin
+            // $display("-------------IF TO ID(%d)-------------", clk_count);
+            // $display("inst_in= %b", inst_in);
+            // $display("pc_in= %b", pc_in);
+            // $display("freeze= %b", freeze);
+            // $display("flush= %b", flush);
+
             clk_count <= clk_count + 1;
             if (~freeze) begin
                 if (flush) begin

@@ -28,13 +28,14 @@ module EXE_stage(
     integer clk_count;
 
     always_ff @(posedge clk, negedge rst_b) begin
-        if(!rst_b)
+        if(!rst_b )
             clk_count <= 0;
         else begin
+            // $display("-----------------EXE stage(%d)-------------------", clk_count);
+            // $display("alu_result=%b",alu_result);
+            // $display("zero=%b",zero);
+            
             clk_count <= clk_count + 1;
-            $display("-----------------EXE stage(%d)-------------------", clk_count);
-            $display("alu_result=%b",alu_result);
-            $display("zero=%b",zero);
         end
     end
     

@@ -56,10 +56,10 @@ module WB_stage(
         if(!rst_b)
             clk_count <= 0;
         else begin
+            // $display("-----------------WB stage(%d)-------------------", clk_count);
+            // $display("rd_data= %b", rd_data);
+            
             clk_count <= clk_count + 1;
-
-            $display("-----------------WB stage(%d)-------------------", clk_count);
-            $display("rd_data= %b", rd_data);
         end
     end
 endmodule

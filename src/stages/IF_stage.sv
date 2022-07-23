@@ -49,16 +49,16 @@ module IF_stage(
     );
     integer clk_count;
     always_ff @(posedge clk, negedge rst_b) begin
-        $display("-----------------IF stage(%d)-------------------", clk_count);
-        $display("inst=%b", inst);
-        $display("pc= %b", pc);
-        $display("next_pc= %b", next_pc);
-        
         if (rst_b == 0) begin
             clk_count <= 0;
             pc <= 0;
         end
         else begin
+            // $display("-----------------IF stage(%d)-------------------", clk_count);
+            // $display("inst=%b", inst);
+            // $display("pc= %b", pc);
+            // $display("next_pc= %b", next_pc);
+            
             clk_count <= clk_count + 1;
             if (!cache_en || hit)
                 pc <= next_pc;           

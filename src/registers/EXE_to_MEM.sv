@@ -58,27 +58,28 @@ module EXE_to_MEM(
   integer clk_count;
 
   always @ (posedge clk, negedge rst_b) begin
-    $display("------------------EXE TO MEM(%d)--------------", clk_count);
-    $display("mem_write_in= %b",mem_write_in);
-    $display("alu_result_in= %b",alu_result_in);
-    $display("is_LB_SB_in= %b",is_LB_SB_in);
-    $display("rt_data_in= %b",rt_data_in);
-    $display("cache_en_in= %b",cache_en_in);
-    $display("mem_to_reg_in= %b",mem_to_reg_in);
-    $display("jump_in= %b",jump_in);
-    $display("pc_in= %b",pc_in);
-    $display("inst_in= %b",inst_in);
-    $display("reg_dst_in= %b",reg_dst_in);
-    $display("reg_write_in= %b",reg_write_in);
-    $display("clk= %b",clk);
-    $display("rst_b= %b",rst_b);
-    $display("freeze= %b",freeze);
 
-    if (!rst_b) begin
+    if (!rst_b || inst_in == 0) begin
       clk_count <= 0;
       {mem_write, alu_result, is_LB_SB, rt_data, cache_en, mem_to_reg, jump, pc, inst, reg_dst, reg_write} <= 0;
     end
     else begin
+      // $display("------------------EXE TO MEM(%d)--------------", clk_count);
+      // $display("mem_write_in= %b",mem_write_in);
+      // $display("alu_result_in= %b",alu_result_in);
+      // $display("is_LB_SB_in= %b",is_LB_SB_in);
+      // $display("rt_data_in= %b",rt_data_in);
+      // $display("cache_en_in= %b",cache_en_in);
+      // $display("mem_to_reg_in= %b",mem_to_reg_in);
+      // $display("jump_in= %b",jump_in);
+      // $display("pc_in= %b",pc_in);
+      // $display("inst_in= %b",inst_in);
+      // $display("reg_dst_in= %b",reg_dst_in);
+      // $display("reg_write_in= %b",reg_write_in);
+      // $display("clk= %b",clk);
+      // $display("rst_b= %b",rst_b);
+      // $display("freeze= %b",freeze);
+
       clk_count <= clk_count + 1;
       if (~freeze) begin
           mem_write <= mem_write_in;

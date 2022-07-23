@@ -75,6 +75,8 @@ module mips_core(
     wire [31:0] inst_EXE;
     wire        reg_dst_EXE;
     wire        reg_write_EXE;
+    wire [4:0]  dest_EXE;
+    wire [4:0]  dest_MEM;
 
     wire [31:0] alu_result_EXE;
     wire        zero_EXE;
@@ -110,10 +112,44 @@ module mips_core(
     wire [31:0] inst_WB;
     wire        reg_dst_WB;
     wire        reg_write_WB;
+    wire        is_imm;
+    wire        has_hazard;
+    wire        is_src1_valid;
+    wire        is_src2_valid;
+    wire [4:0]  src1_forw_EXE, src2_ID, src2_forw_EXE;
 
     wire [31:0] rd_data_WB;  
 
     assign inst_addr = pc_IF;
+
+	hazard_detector hazard (
+		// INPUTS
+		.is_imm(is_imm),
+		.is_src1_valid(is_src1_valid),
+		.is_src2_valid(is_src2_valid),
+		.rs_num(rs_num),
+		.rt_num(rt_num),
+		.dest_EXE(dest_EXE),
+		.dest_MEM(dest_MEM),
+		.reg_write_EXE(reg_write_EXE),
+		.reg_write_MEM(reg_write_MEM),
+		.mem_write_EXE(mem_write_EXE),
+		// OUTPUTS
+		.has_hazard(has_hazard)
+	);
+
+	// forwarding forwrding (
+	// 	.src1_EXE(src1_forw_EXE),
+	// 	.src2_EXE(src2_forw_EXE),
+	// 	.ST_src_EXE(dest_EXE),
+	// 	.dest_MEM(dest_MEM),
+	// 	.dest_WB(rd_num),
+	// 	.reg_write_MEM(reg_write_MEM),
+	// 	.WB_EN_WB(reg_write_WB),
+	// 	.val1_sel(a_EXE),
+	// 	.val2_sel(b_EXE),
+	// 	.ST_val_sel(ST_val_sel)
+	// );
 
     regfile regfile_unit(
         .rs_data(rs_data),
@@ -128,7 +164,7 @@ module mips_core(
         .halted(halted)
     );
 
-    IF_stage IF_stage(
+    IF_stage IF_stage (
         // outputs
         .pc(pc_IF),
         // inputs
@@ -182,10 +218,15 @@ module mips_core(
         .a(a_ID),
         .b(b_ID),
         .halted(halted_ID),
+        .is_imm(is_imm),
+        .is_src1_valid(is_src1_valid),    
+        .is_src2_valid(is_src2_valid),
+        .src2(src2_ID),           
         //inputs
         .inst(inst_ID),
         .rs_data(rs_data),
         .rt_data(rt_data),
+        .has_hazard(has_hazard),
         .clk(clk),
         .rst_b(rst_b)
     ); 
@@ -205,6 +246,9 @@ module mips_core(
         .inst(inst_EXE),
         .reg_dst(reg_dst_EXE),
         .reg_write(reg_write_EXE),
+        .dest(dest_EXE),
+        .src1_in(rs_num),
+        .src2_in(src2_ID),
         // inputs
         .a_in(a_ID),
         .b_in(b_ID),
@@ -219,6 +263,8 @@ module mips_core(
         .inst_in(inst_ID),
         .reg_dst_in(reg_dst_ID),
         .reg_write_in(reg_write_ID),
+        .src1(src1_forw_EXE),
+        .src2(src2_forw_EXE),
         .clk(clk),
         .rst_b(rst_b),
         .freeze(1'b0)
@@ -231,6 +277,7 @@ module mips_core(
         // inputs
         .a(a_EXE),
         .b(b_EXE),
+        // .ST_val_sel(ST_val_sel),
         .control(control_EXE),
         .clk(clk),
         .rst_b(rst_b)
@@ -334,14 +381,29 @@ module mips_core(
         .rst_b(rst_b)
     );
 
-    // integer clk_count;
-    // always_ff @(posedge clk, negedge rst_b) begin
-    //     $display("***************CLK COUNT = %d*****************", clk_count);
-    //     if (!rst_b)
-    //         clk_count <= 0;
-    //     else
-    //         clk_count <= clk_count + 1;
-    // end
+    integer clk_count;
+    always_ff @(posedge clk, negedge rst_b) begin
+        if (!rst_b)
+            clk_count <= 0;
+        else begin
+            $display("---------------------MIPS CORE(%d)*****************", clk_count);
+            $display("inst= %b", inst);
+            $display("inst_addr= %b", inst_addr);
+            $display("has_hazard= %b", has_hazard);
+            $display("is_imm= %b",is_imm);
+            $display("is_src1_valid= %b",is_src1_valid);
+            $display("is_src2_valid= %b",is_src2_valid);
+            $display("rs_num= %b",rs_num);
+            $display("rt_num= %b",rt_num);
+            $display("dest_EXE= %b",dest_EXE);
+            $display("dest_MEM= %b",dest_MEM);
+            $display("reg_write_EXE= %b",reg_write_EXE);
+            $display("reg_write_MEM= %b",reg_write_MEM);
+            $display("mem_write_EXE= %b",mem_write_EXE);
+
+            clk_count <= clk_count + 1;
+        end
+    end
 
 
 endmodule

@@ -12,6 +12,9 @@ module control(
     jr,
     jump,
     do_extend,
+    is_imm,
+    is_src1_valid,
+    is_src2_valid,
     opcode,
     func
 );
@@ -31,6 +34,9 @@ module control(
     output reg [1:0]jump;
     output reg do_extend;
     output reg is_LB_SB;
+    output reg is_imm;
+    output reg is_src1_valid;
+    output reg is_src2_valid;
 
     assign cache_en = (mem_write || mem_read);
     
@@ -47,6 +53,9 @@ module control(
         jr = 1'b0;
         jump = 2'b00;
         is_LB_SB = 1'b0;
+        is_imm = 1'b0;
+        is_src1_valid = 1'b1;
+        is_src2_valid = 1'b1;
         /* verilator lint_off CASEX */
         casex (opcode)
             6'b000000: begin // I-type
@@ -57,9 +66,11 @@ module control(
                     6'b000000, 6'b000010, 6'b000011: begin // shifts
                     alu_src[0] = 1'b1; // use sh_amount
                     alu_op = 4'b0000;
+                    is_src1_valid = 1'b0;
                     end
                     6'b001000: begin // jr
                         jr = 1'b1;
+                        is_src2_valid = 1'b0;
                     end
                     default: begin
                     end
@@ -70,18 +81,24 @@ module control(
                 alu_src = 2'b10;
                 reg_write = 1'b1;
                 alu_op = 4'b0001;
+                is_imm = 1'b1;
+                is_src2_valid = 1'b0;
             end
             6'b001001: begin // ADDiu
                 alu_src = 2'b10;
                 reg_write = 1'b1;
                 alu_op = 4'b0010;
                 do_extend = 1'b0;
+                is_src2_valid = 1'b0;
+                is_imm = 1'b1;
             end
             6'b001100: begin // ANDi
                 alu_src = 2'b10;
                 reg_write = 1'b1;
                 alu_op = 4'b0011;
                 do_extend = 1'b0;
+                is_src2_valid = 1'b0;
+                is_imm = 1'b1;
             end
 
             6'b001110: begin // XORi
@@ -89,6 +106,8 @@ module control(
                 reg_write = 1'b1;
                 alu_op = 4'b0100;
                 do_extend = 1'b0;
+                is_src2_valid = 1'b0;
+                is_imm = 1'b1;
             end
             
             6'b001101: begin // ORi
@@ -96,31 +115,50 @@ module control(
                 reg_write = 1'b1;
                 do_extend = 1'b0;
                 alu_op = 4'b0101;
+                is_src2_valid = 1'b0;
+                is_imm = 1'b1;
             end
 
-            6'b0001xx: begin // BEQ, BNE, BLEZ, BGTZ
+            6'b000100, 6'b000101: begin // BEQ, BNE
                 alu_src = 2'b00;
                 branch = opcode[2:0];
                 alu_op = 4'b1000;
+                is_imm = 1'b1;
+            end
+
+            6'b000110, 6'b000111: begin // BLEZ, BGTZ
+                alu_src = 2'b00;
+                branch = opcode[2:0];
+                alu_op = 4'b1000;
+                is_imm = 1'b1;
+                is_src2_valid = 1'b0;
             end
 
             6'b000001: begin // BGEZ
                 alu_src = 2'b00;
                 branch = 3'b001;
+                is_src2_valid = 1'b0;
+                is_imm = 1'b1;
             end
             
             6'b001111: begin // Lui
                 alu_src = 2'b10;
                 reg_write = 1'b1;
                 alu_op = 4'b0111;
+                is_src2_valid = 1'b0;
+                is_imm = 1'b1;
             end
 
             6'b000010: begin // j
+                is_src1_valid = 1'b0;
+                is_src2_valid = 1'b0;
                 jump = 2'b01;
             end
 
             6'b000011: begin // jal
                 jump = 2'b10;
+                is_src1_valid = 1'b0;
+                is_src2_valid = 1'b0;
                 reg_write = 1'b1;
             end
 
@@ -130,14 +168,15 @@ module control(
                 alu_op = 4'b0001;
                 mem_read = 1'b1; // has no effect
                 mem_to_reg = 1;
-
+                is_src2_valid = 1'b0;
+                is_imm = 1'b1;
             end
 
             6'b101011: begin // SW
                 alu_src = 2'b10;
                 alu_op = 4'b0001;
                 mem_write = 1'b1;
-                
+                is_imm = 1'b1;
             end
 
             6'b100000: begin // LB
@@ -147,6 +186,7 @@ module control(
                 mem_read = 1'b1; // has no effect
                 mem_to_reg = 1;
                 is_LB_SB = 1'b1;
+                is_imm = 1'b1;
             end
 
             6'b101000: begin // SB
@@ -154,6 +194,7 @@ module control(
                 alu_op = 4'b0001;
                 mem_write = 1'b1;
                 is_LB_SB = 1'b1;
+                is_imm = 1'b1;
             end
             
             
@@ -161,6 +202,8 @@ module control(
                 alu_src = 2'b10;
                 alu_op = 4'b0110;
                 reg_write = 1'b1;
+                is_src2_valid = 1'b0;
+                is_imm = 1'b1;
             end
 
             default: begin
