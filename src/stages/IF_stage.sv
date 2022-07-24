@@ -13,7 +13,8 @@ module IF_stage(
     inst,
     cache_en,
     hit,
-    sign_extend_immediate
+    sign_extend_immediate, 
+    freeze
 );
     
     input            clk;
@@ -28,6 +29,7 @@ module IF_stage(
     input            cache_en;
     input            hit;
     input [31:0]     sign_extend_immediate;
+    input            freeze;
     
     output reg [31:0] pc;
 
@@ -58,10 +60,11 @@ module IF_stage(
             // $display("inst=%b", inst);
             // $display("pc= %b", pc);
             // $display("next_pc= %b", next_pc);
-            
             clk_count <= clk_count + 1;
-            if (!cache_en || hit)
-                pc <= next_pc;           
+            if (!freeze) begin
+                if (!cache_en || hit)
+                    pc <= next_pc;           
+            end
         end
     end
 

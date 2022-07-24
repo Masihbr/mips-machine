@@ -113,6 +113,7 @@ module mips_core(
     wire        reg_dst_WB;
     wire        reg_write_WB;
     wire        is_imm;
+    /* verilator lint_off UNOPTFLAT */
     wire        has_hazard;
     wire        is_src1_valid;
     wire        is_src2_valid;
@@ -179,7 +180,8 @@ module mips_core(
         .inst(inst),
         .cache_en(cache_en_ID),
         .hit(hit_MEM),
-        .sign_extend_immediate(sign_extend_immediate_ID)
+        .sign_extend_immediate(sign_extend_immediate_ID),
+        .freeze(has_hazard)
     ); 
 
     IF_to_ID IF_to_ID (
@@ -192,7 +194,7 @@ module mips_core(
         .clk(clk),
         .rst_b(rst_b),
         .flush(flush_IF),
-        .freeze(1'b0)
+        .freeze(has_hazard)
     );
     
     assign rs_num = inst_ID[25:21];

@@ -2,7 +2,7 @@ module IF_to_ID (
     // outputs
     pc,
     inst,
-    // outputs
+    // inputs
     pc_in,
     inst_in,
     clk,
@@ -36,7 +36,7 @@ module IF_to_ID (
             // $display("flush= %b", flush);
 
             clk_count <= clk_count + 1;
-            if (~freeze) begin
+            if (!freeze) begin
                 if (flush) begin
                     inst <= 0;
                     pc <= 0;

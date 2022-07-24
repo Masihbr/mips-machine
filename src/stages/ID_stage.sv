@@ -99,6 +99,7 @@ module ID_stage(
         .jr(jr),
         .jump(jump),
         .cache_en(cache_en),
+        .has_hazard(has_hazard),
         // inputs
         .func(func),
         .opcode(opcode)
