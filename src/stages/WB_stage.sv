@@ -1,7 +1,7 @@
-module WB_stage(
-    rd_data,
-    rd_num,
-    halted,
+module WB_stage (
+    // outputs
+    dest_reg_data,
+    // inputs
     is_LB_SB,
     cache_data_out,
     mem_block,
@@ -9,8 +9,6 @@ module WB_stage(
     jump,
     pc,
     alu_result,
-    inst,
-    reg_dst,
     clk,
     rst_b
 );
@@ -21,15 +19,11 @@ module WB_stage(
     input [1:0]  jump;
     input [31:0] pc;
     input [31:0] alu_result;
-    input [31:0] inst;
-    input reg_dst;
     input clk;
     input rst_b;
 
-    output [31:0] rd_data;
-    output [4:0]  rd_num;
+    output [31:0] dest_reg_data;
 
-    output halted;
 
     wire [31:0] cache_data_out_32_bit;
 
@@ -42,23 +36,22 @@ module WB_stage(
                                         ? 24'hffffff 
                                         : 24'b0 , cache_data_out[mem_block] };
 
-    assign rd_data = (mem_to_reg == 1'b1) ? cache_data_out_32_bit : (jump == 2'b10) ? pc + 8 : alu_result;
-    assign rd_num = (reg_dst == 1'b1) ? inst[15:11] : (jump == 2'b10) ? 5'd31 : inst[20:16];
-
-
-    assign opcode = inst[31:26];
-    assign func = inst[5:0];
-    assign halted = (opcode == 0 && func == 6'b001100) ? 1'b1 : 1'b0;
-
+    assign dest_reg_data = (mem_to_reg == 1'b1) ? cache_data_out_32_bit : (jump == 2'b10) ? pc + 8 : alu_result;
 
     integer clk_count;
     always_ff @(posedge clk, negedge rst_b) begin
         if(!rst_b)
             clk_count <= 0;
         else begin
-            // $display("-----------------WB stage(%d)-------------------", clk_count);
-            // $display("rd_data= %b", rd_data);
-            
+            // // $display("-----------------WB stage(%d)-------------------", clk_count);
+            // // // $display("dest_reg_data= %b", dest_reg_data);
+            // // $display("is_LB_SB= %b", is_LB_SB);
+            // // $display("cache_data_out= %b", cache_data_out);
+            // // $display("mem_block= %b", mem_block);
+            // // $display("mem_to_reg= %b", mem_to_reg);
+            // // $display("jump= %b", jump);
+            // // $display("pc= %b", pc);
+            // // $display("alu_result= %b", alu_result);
             clk_count <= clk_count + 1;
         end
     end

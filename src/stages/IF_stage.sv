@@ -7,7 +7,6 @@ module IF_stage(
     jump,
     branch,
     jr,
-    do_extend,
     zero,
     rs_data,
     inst,
@@ -22,7 +21,6 @@ module IF_stage(
     input [1:0]      jump;
     input [2:0]      branch;
     input            jr;
-    input            do_extend;
     input            zero;
     input [31:0]     rs_data;
     input [31:0]     inst;
@@ -49,6 +47,7 @@ module IF_stage(
         .sign_extend_immediate(sign_extend_immediate),
         .rs_data(rs_data)
     );
+
     integer clk_count;
     always_ff @(posedge clk, negedge rst_b) begin
         if (rst_b == 0) begin
@@ -56,14 +55,9 @@ module IF_stage(
             pc <= 0;
         end
         else begin
-            // $display("-----------------IF stage(%d)-------------------", clk_count);
-            // $display("inst=%b", inst);
-            // $display("pc= %b", pc);
-            // $display("next_pc= %b", next_pc);
             clk_count <= clk_count + 1;
             if (!freeze) begin
-                if (!cache_en || hit)
-                    pc <= next_pc;           
+                pc <= next_pc;           
             end
         end
     end

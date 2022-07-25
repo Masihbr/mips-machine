@@ -72,12 +72,18 @@ module MEM_stage(
             clk_count <= 0;
         else begin
             // $display("-----------------MEM stage(%d)-------------------", clk_count);
-            // $display("hit= %b",hit);
-            // $display("cache_data_out= %b",cache_data_out);
-            // $display("mem_data_in= %b",mem_data_in);
-            // $display("mem_write_en= %b",mem_write_en);
-            // $display("mem_addr= %b",mem_addr);
-            // $display("mem_block= %b",mem_block);
+            // $display("mem_write= %b",mem_write);
+            // $display("alu_result= %b",alu_result);
+            // $display("is_LB_SB= %b",is_LB_SB);
+            // $display("rt_data= %b",rt_data);
+            // $display("mem_data_out= %b",mem_data_out);
+            // $display("cache_en= %b",cache_en);
+            // // $display("hit= %b",hit);
+            // // $display("cache_data_out= %b",cache_data_out);
+            // // $display("mem_data_in= %b",mem_data_in);
+            // // $display("mem_write_en= %b",mem_write_en);
+            // // $display("mem_addr= %b",mem_addr);
+            // // $display("mem_block= %b",mem_block);
 
             clk_count <= clk_count + 1;
         end

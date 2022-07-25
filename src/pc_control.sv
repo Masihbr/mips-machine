@@ -35,7 +35,7 @@ module pc_control(
             case(branch)
                 3'b100: begin
                     if (zero == 1'b1) begin
-                        next_pc = pc4 + {sign_extend_immediate[29:0],2'b00};
+                        next_pc = pc + {sign_extend_immediate[29:0],2'b00};
                     end
                 end
 

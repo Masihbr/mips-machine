@@ -1,6 +1,5 @@
 module alu(
     alu_result,
-	zero,
 	a, 
     b,
     control
@@ -12,9 +11,6 @@ module alu(
     input [LENGTH-1:0]          b;
     input [CONTROL_LENGTH-1:0]  control;
     output reg [LENGTH-1:0]     alu_result;
-    output                      zero;
-
-    assign zero = (alu_result == 0);
 
     always_comb begin
         case (control)
