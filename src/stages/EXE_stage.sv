@@ -24,6 +24,8 @@ module EXE_stage(
     wire [31:0] flaot_alu_result;
     wire        float_alu_zero;
 
+    wire DBZ, QNAN, SNAN, Inexact, Underflow, Overflow;
+
     
 
     alu alu_unit(
@@ -36,17 +38,24 @@ module EXE_stage(
         .control(control)
     );
 
-    falu floating_point_alu(
+    floating_point_alu falu(
         //outputs
-        .alu_result(flaot_alu_result),
+        .falu_result(flaot_alu_result),
         .zero(float_alu_zero),
+        .DBZ(DBZ),
+        .QNAN(QNAN),
+        .SNAN(SNAN),
+        .Inexact(Inexact),
+        .Underflow(Underflow),
+        .Overflow(Overflow),
         //inputs
         .a(a),
         .b(b),
         .opcode(control)
+
     );
 
-    assign alu_result = alu_select? falu_result : int_alu_result;
+    assign alu_result = alu_select? flaot_alu_result : int_alu_result;
     assign zero = alu_select? float_alu_zero : int_alu_zero;
 
     integer clk_count;

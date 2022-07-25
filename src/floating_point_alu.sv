@@ -56,11 +56,15 @@ module floating_point_alu(
         result_mantis = 0;
         result_exponent = 0;
 
+        rounded = 0;
+        trash = 0;
+
+
         a_exponent = {24'b0, a[30 -: 8]};
         b_exponent = {24'b0, b[30 -: 8]};
 
-        a_mantis = {9'b0, a[22 -: 22]};
-        b_mantis = {9'b0, b[22 -: 22]};
+        a_mantis = {9'b0, a[22 -: 23]};
+        b_mantis = {9'b0, b[22 -: 23]};
 
         a_sign = a[31];
         b_sign = b[31];
