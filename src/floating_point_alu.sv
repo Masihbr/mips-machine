@@ -1,5 +1,6 @@
 module floating_point_alu(
     falu_result,
+    zero,
     DBZ,
     QNAN,
     SNAN,
@@ -15,7 +16,7 @@ module floating_point_alu(
     input [3:0] opcode;
 
     output reg [31:0] falu_result;
-    output reg DBZ, QNAN, SNAN, Inexact, Underflow, Overflow;
+    output reg zero, DBZ, QNAN, SNAN, Inexact, Underflow, Overflow;
 
     reg [31:0] a_exponent, b_exponent, a_mantis, b_mantis;
     reg a_sign, b_sign, result_sign;
@@ -40,6 +41,7 @@ module floating_point_alu(
     always @(*) begin
 
         falu_result = 0;
+        zero = 0;
         DBZ = 0;
         QNAN = 0;
         SNAN = 0;
@@ -132,6 +134,9 @@ module floating_point_alu(
         result_real = result_real < 0? -result_real: result_real;
 
         result_exponent = 127;
+
+        if (result_real == 0)
+            zero = 1;
 
         alt = result_real;
         if (alt < 1) begin

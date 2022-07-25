@@ -62,6 +62,10 @@ module mips_core(
     wire [31:0] b_ID;
     wire        halted_ID;
 
+    wire alu_select_ID;
+    wire alu_select_EXE;
+
+
     wire [31:0] a_EXE;
     wire [31:0] b_EXE;
     wire [3:0]  control_EXE;
@@ -223,7 +227,8 @@ module mips_core(
         .is_imm(is_imm),
         .is_src1_valid(is_src1_valid),    
         .is_src2_valid(is_src2_valid),
-        .src2(src2_ID),           
+        .src2(src2_ID),          
+        .alu_select(alu_select_ID), 
         //inputs
         .inst(inst_ID),
         .rs_data(rs_data),
@@ -251,6 +256,7 @@ module mips_core(
         .dest(dest_EXE),
         .src1_in(rs_num),
         .src2_in(src2_ID),
+        .alu_select(alu_select_EXE),
         // inputs
         .a_in(a_ID),
         .b_in(b_ID),
@@ -267,6 +273,7 @@ module mips_core(
         .reg_write_in(reg_write_ID),
         .src1(src1_forw_EXE),
         .src2(src2_forw_EXE),
+        .alu_select_in(alu_select_ID),
         .clk(clk),
         .rst_b(rst_b),
         .freeze(1'b0)
@@ -279,6 +286,7 @@ module mips_core(
         // inputs
         .a(a_EXE),
         .b(b_EXE),
+        .alu_select(alu_select_EXE),
         // .ST_val_sel(ST_val_sel),
         .control(control_EXE),
         .clk(clk),

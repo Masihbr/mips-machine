@@ -22,6 +22,7 @@ module ID_stage(
     is_src1_valid,
     is_src2_valid,
     src2,
+    alu_select,
     // inputs
     inst,
     rs_data,
@@ -53,6 +54,7 @@ module ID_stage(
     output        is_imm;
     output        is_src1_valid;
     output        is_src2_valid;
+    output        alu_select;
 
 
     input [31:0] inst;
@@ -108,6 +110,7 @@ module ID_stage(
     alu_control alu_control_unit(
         // outputs
         .control(control),
+        .alu_select(alu_select),
         // inputs
         .alu_op(alu_op),
         .func(func)

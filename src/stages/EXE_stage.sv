@@ -4,6 +4,7 @@ module EXE_stage(
     a,
     b,
     control,
+    alu_select,
     clk, 
     rst_b
 );
@@ -12,19 +13,42 @@ module EXE_stage(
     input [31:0] b;
     input [3:0]  control;
     input clk, rst_b;
+    input alu_select;
 
     output [31:0] alu_result;
     output        zero;
 
+    wire [31:0] int_alu_result;
+    wire        int_alu_zero;
+
+    wire [31:0] flaot_alu_result;
+    wire        float_alu_zero;
+
+    
+
     alu alu_unit(
         // outputs
-        .alu_result(alu_result),
-        .zero(zero),
+        .alu_result(int_alu_result),
+        .zero(int_alu_zero),
         // inputs
         .a(a), 
         .b(b),
         .control(control)
     );
+
+    falu floating_point_alu(
+        //outputs
+        .alu_result(flaot_alu_result),
+        .zero(float_alu_zero),
+        //inputs
+        .a(a),
+        .b(b),
+        .opcode(control)
+    );
+
+    assign alu_result = alu_select? falu_result : int_alu_result;
+    assign zero = alu_select? float_alu_zero : int_alu_zero;
+
     integer clk_count;
 
     always_ff @(posedge clk, negedge rst_b) begin

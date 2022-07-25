@@ -16,6 +16,7 @@ module ID_to_EXE (
     dest,
     src1,
     src2,
+    alu_select,
     // inputs
     a_in,
     b_in,
@@ -32,6 +33,7 @@ module ID_to_EXE (
     reg_write_in,
     src1_in,
     src2_in,
+    alu_select_in,
     clk,
     rst_b,
     freeze
@@ -55,6 +57,7 @@ module ID_to_EXE (
     input        clk;
     input        rst_b;
     input        freeze;
+    input        alu_select_in;
 
 
     output reg [31:0] a;
@@ -73,6 +76,7 @@ module ID_to_EXE (
     output reg [4:0]  dest;
     output reg [4:0]  src1;
     output reg [4:0]  src2;
+    output reg        alu_select;
 
     
 
@@ -81,7 +85,7 @@ module ID_to_EXE (
   always @ (posedge clk, negedge rst_b) begin
     if (!rst_b || inst_in == 0) begin
       clk_count <= 0;
-      {a, b, control, is_LB_SB, mem_to_reg, jump, mem_write, rt_data, cache_en, pc, inst, reg_dst, reg_write, src1, src2} <= 0;
+      {a, b, control, is_LB_SB, mem_to_reg, jump, mem_write, rt_data, cache_en, pc, inst, reg_dst, reg_write, src1, src2, alu_select} <= 0;
     end
     else begin
       // $display("------------------ID TO EXE(%d)--------------", clk_count);
@@ -120,6 +124,7 @@ module ID_to_EXE (
             reg_write <= reg_write_in;
             src1 <= src1_in;
             src2 <= src2_in;
+            alu_select <= alu_select_in;
             dest <= (reg_dst_in == 1'b1) ? inst_in[15:11] : (jump_in == 2'b10) ? 5'd31 : inst_in[20:16];
         end
     end
