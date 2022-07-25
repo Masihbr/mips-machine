@@ -7,6 +7,7 @@ module ID_stage(
     dest_reg_num,
     val1,
     val2,
+    saved_val,
     zero,
     is_reg1_valid,
     is_reg2_valid,
@@ -16,21 +17,10 @@ module ID_stage(
     jr,
     cache_en,
     is_LB_SB,
+    is_SW_SB,
     mem_to_reg,
     mem_write,
     reg_write,
-    // reg_dst,
-    // mem_read,
-    // alu_op,
-    // is_sign_extended,
-    // control,
-    // a,
-    // b,
-    // halted,
-    // is_imm,
-  
-    // src2,
-    // inputs
     inst,
     reg1_data,
     reg2_data,
@@ -46,6 +36,7 @@ module ID_stage(
     output [4:0]  dest_reg_num;
     output [31:0] val1;
     output [31:0] val2;
+    output [31:0] saved_val;
     output        zero;
     output        is_reg1_valid;
     output        is_reg2_valid;
@@ -58,20 +49,7 @@ module ID_stage(
     output        mem_write;
     output        reg_write;
     output        mem_to_reg;
-
-
-
-
-
-    // output        reg_dst;
-    // output        mem_read;
-    // // output [3:0]  alu_op;
-    // output        is_sign_extended;
-    
-    // output [4:0]  src2;
-    // output        is_imm;
-
-
+    output        is_SW_SB;
 
     input [31:0] inst;
     input [31:0] reg1_data;
@@ -108,7 +86,8 @@ module ID_stage(
     assign dest_reg_num = dest_reg_sel ? rd_num : (jump == 2'b10) ? 5'd31 : rt_num;
 
     assign val1 = is_reg1_valid ? reg1_data : {{27{1'b0}}, sh_amount};
-    assign val2 = is_reg2_valid ? reg2_data : sign_extend_immediate;
+    assign val2 = (is_reg2_valid && !is_SW_SB) ? reg2_data : sign_extend_immediate;
+    assign saved_val = reg2_data;
     assign zero = (val1 == val2) ? 1'b1 : 1'b0;
 
 
@@ -124,14 +103,10 @@ module ID_stage(
         .jr(jr),
         .cache_en(cache_en),
         .is_LB_SB(is_LB_SB),
+        .is_SW_SB(is_SW_SB),
         .mem_to_reg(mem_to_reg),
         .mem_write(mem_write),
-        // .is_imm(is_imm),
-        // .reg_dst(reg_dst),
         .dest_reg_write(reg_write),
-        // .mem_read(mem_read),
-        // .has_hazard(has_hazard),
-
         // inputs
         .func(func),
         .opcode(opcode)
@@ -151,28 +126,28 @@ module ID_stage(
             clk_count <= 0;
         else begin
             clk_count <= clk_count + 1;
-            // // $display("-----------------Id stage(%d)-------------------", clk_count);
-            // // $display("is_imm= %b", is_imm);
-            // // $display("is_reg1_valid= %b", is_reg1_valid);
-            // // $display("is_reg2_valid= %b", is_reg2_valid);
-            // // $display("has_hazard= %b", has_hazard);
-            // // $display("is_LB_SB=%b", is_LB_SB);
-            // // $display("reg_dst=%b", reg_dst);
-            // // $display("mem_to_reg=%b", mem_to_reg);
-            // // $display("reg_write=%b", reg_write);
-            // // $display("mem_read=%b", mem_read);
-            // // $display("mem_write=%b", mem_write);
-            // // $display("branch=%b", branch);
-            // // $display("alu_op=%b", alu_op);
-            // // $display("is_sign_extended=%b", is_sign_extended);
-            // // $display("jr=%b", jr);
-            // // $display("jump=%b", jump);
-            // // $display("cache_en=%b", cache_en);
-            // // $display("sign_extend_immediate=%b", sign_extend_immediate);
-            // // $display("control=%b", control);
-            // // $display("a=%b", a);
-            // // $display("b=%b", b);
-            // // $display("halted=%b", halted);
+            $display("------------------- ID STAGE(%d) ---------------", clk_count);
+            $display("reg1_data= %b", reg1_data);
+            $display("reg2_data= %b", reg2_data);
+            $display("halted= %b", halted);
+            $display("sign_extend_immediate= %b", sign_extend_immediate);
+            $display("reg1_num= %b", reg1_num);
+            $display("reg2_num= %b", reg2_num);
+            $display("dest_reg_num= %b", dest_reg_num);
+            $display("val1= %b", val1);
+            $display("val2= %b", val2);
+            $display("zero= %b", zero);
+            $display("is_reg1_valid= %b", is_reg1_valid);
+            $display("is_reg2_valid= %b", is_reg2_valid);
+            $display("control= %b", control);
+            $display("jump= %b", jump);
+            $display("branch= %b", branch);
+            $display("jr= %b", jr);
+            $display("cache_en= %b", cache_en);
+            $display("is_LB_SB= %b", is_LB_SB);
+            $display("mem_write= %b", mem_write);
+            $display("reg_write= %b", reg_write);
+            $display("mem_to_reg= %b", mem_to_reg);
         end
     end
     

@@ -13,6 +13,7 @@ module control(
     jr,
     cache_en,
     is_LB_SB,
+    is_SW_SB,
     mem_to_reg,
     // inputs
     opcode,
@@ -35,7 +36,7 @@ module control(
     output reg [1:0] jump;
     output reg is_sign_extended;
     output reg is_LB_SB;
-    // output reg is_imm;
+    output reg is_SW_SB;
     output reg is_reg1_valid;
     output reg is_reg2_valid;
 
@@ -57,7 +58,7 @@ module control(
         branch = 3'b000;
         jr = 1'b0;
         is_LB_SB = 1'b0;
-        // is_imm = 1'b0;
+        is_SW_SB = 1'b0;
 
         /* verilator lint_off CASEX */
         // if (!has_hazard) begin
@@ -149,7 +150,7 @@ module control(
                 6'b101011: begin // SW
                     alu_op = 4'b0001;
                     mem_write = 1'b1;
-                    // is_imm = 1'b1;
+                    is_SW_SB = 1'b1;
                 end
 
                 6'b100000: begin // LB
@@ -158,6 +159,7 @@ module control(
                     is_LB_SB = 1'b1;
                     mem_read = 1'b1; // has no effect
                     mem_to_reg = 1;
+                    is_reg2_valid = 1'b0;
                     // is_imm = 1'b1;
                 end
 
@@ -165,7 +167,7 @@ module control(
                     alu_op = 4'b0001;
                     is_LB_SB = 1'b1;
                     mem_write = 1'b1;
-                    // is_imm = 1'b1;
+                    is_SW_SB = 1'b1;
                 end
                 
                 

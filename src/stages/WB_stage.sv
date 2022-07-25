@@ -19,8 +19,8 @@ module WB_stage (
     input [1:0]  jump;
     input [31:0] pc;
     input [31:0] alu_result;
-    input clk;
-    input rst_b;
+    input        clk;
+    input        rst_b;
 
     output [31:0] dest_reg_data;
 
@@ -43,15 +43,16 @@ module WB_stage (
         if(!rst_b)
             clk_count <= 0;
         else begin
-            // // $display("-----------------WB stage(%d)-------------------", clk_count);
-            // // // $display("dest_reg_data= %b", dest_reg_data);
-            // // $display("is_LB_SB= %b", is_LB_SB);
-            // // $display("cache_data_out= %b", cache_data_out);
-            // // $display("mem_block= %b", mem_block);
-            // // $display("mem_to_reg= %b", mem_to_reg);
-            // // $display("jump= %b", jump);
-            // // $display("pc= %b", pc);
-            // // $display("alu_result= %b", alu_result);
+            $display("-----------------WB stage(%d)-------------------", clk_count);
+            $display("is_LB_SB= %b", is_LB_SB);
+            $display("cache_data_out= %b", {cache_data_out[0], cache_data_out[1], cache_data_out[2], cache_data_out[3]});
+            $display("cache_data_out_32_bit= %b", cache_data_out_32_bit);
+            $display("mem_block= %b", mem_block);
+            $display("mem_to_reg= %b", mem_to_reg);
+            $display("jump= %b", jump);
+            $display("pc= %b", pc);
+            $display("alu_result= %b", alu_result);
+            $display("dest_reg_data= %b", dest_reg_data);
             clk_count <= clk_count + 1;
         end
     end

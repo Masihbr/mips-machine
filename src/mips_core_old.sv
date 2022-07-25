@@ -171,13 +171,13 @@
 //     integer clk_count;
 //     always_ff @(posedge clk, negedge rst_b) begin
 //         // if (opcode == 6'b101000 || opcode == 6'b100011) begin
-//         // // // $display("------------------INSTR------------------");
-//         // // // $display("inst=%b\nopcode=%b\npc=%d\na=%h\nb=%h\nalu_res=%h\nrd_data=%h\nalu_src=%b\nimm=%h\nrd_num=%d\ncontrol=%d\nalu_op=%b\nfunc=%b\nnext_pc=%d\n",
+//         // // // // $display("------------------INSTR------------------");
+//         // // // // $display("inst=%b\nopcode=%b\npc=%d\na=%h\nb=%h\nalu_res=%h\nrd_data=%h\nalu_src=%b\nimm=%h\nrd_num=%d\ncontrol=%d\nalu_op=%b\nfunc=%b\nnext_pc=%d\n",
 //         // inst, opcode, pc, a, b, alu_result, rd_data,alu_src, sign_extend_immediate, rd_num, control, alu_op, func, next_pc);
         
-//         // // // $display("------------------CACHE------------------");
-//         // // // $display("hit=%b\ncache_data_out=%h\nmem_data_in=%h\nmem_write_en=%b\ncache_addr=%d\nmem_addr=%d\ncache_data_in=%h\nmem_data_out=%h\ncache_write_en=%b\ncache_en=%b\nclkcount=%d", hit,{cache_data_out[0],cache_data_out[1],cache_data_out[2],cache_data_out[3]},{mem_data_in[0],mem_data_in[1],mem_data_in[2],mem_data_in[3]},mem_write_en,cache_addr,mem_addr,{cache_data_in[0],cache_data_in[1],cache_data_in[2],cache_data_in[3]},{mem_data_out[0],mem_data_out[1],mem_data_out[2],mem_data_out[3]},cache_write_en,cache_en,clk_count);        
-//         // // // $display("-----------------------------------------");
+//         // // // // $display("------------------CACHE------------------");
+//         // // // // $display("hit=%b\ncache_data_out=%h\nmem_data_in=%h\nmem_write_en=%b\ncache_addr=%d\nmem_addr=%d\ncache_data_in=%h\nmem_data_out=%h\ncache_write_en=%b\ncache_en=%b\nclkcount=%d", hit,{cache_data_out[0],cache_data_out[1],cache_data_out[2],cache_data_out[3]},{mem_data_in[0],mem_data_in[1],mem_data_in[2],mem_data_in[3]},mem_write_en,cache_addr,mem_addr,{cache_data_in[0],cache_data_in[1],cache_data_in[2],cache_data_in[3]},{mem_data_out[0],mem_data_out[1],mem_data_out[2],mem_data_out[3]},cache_write_en,cache_en,clk_count);        
+//         // // // // $display("-----------------------------------------");
 //         // end
 //         if (rst_b == 0) begin
 //             pc <= 0;

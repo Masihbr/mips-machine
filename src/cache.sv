@@ -47,8 +47,10 @@ module cache(
 
     integer i;
 
-    assign hit = (valid[ea] && tag[ea] == input_tag) || (tag[ea]!= input_tag && ((dirty[ea] && counter == 5) || (!dirty[ea] && counter == 4))) || (!valid[ea] && counter == 4);
+    // assign hit = 
+    // (valid[ea] && tag[ea] == input_tag) || (tag[ea]!= input_tag && ((dirty[ea] && counter == 1) || (!dirty[ea] && counter == 0))) || (!valid[ea] && counter == 0);
 
+    assign hit = 1;
     always_ff @(posedge clk, negedge rst_b) begin
         if (rst_b == 0) begin
             counter <= 0;
@@ -74,7 +76,7 @@ module cache(
                         mem_addr <= cache_addr;
                         mem_write_en <= 0;
 
-                        if ((dirty[ea] && counter == 5) || (!dirty[ea] && counter == 4)) begin
+                        if ((dirty[ea] && counter == 1) || (!dirty[ea] && counter == 0)) begin
                             data[ea] <= {mem_data_out[3], mem_data_out[2], mem_data_out[1], mem_data_out[0]}; 
                             valid[ea] <= 1;
                             dirty[ea] <= 0;
@@ -87,7 +89,7 @@ module cache(
                 end
             end else begin
                 mem_addr <= cache_addr;
-                if (counter == 4) begin
+                if (counter == 0) begin
                     data[ea] <= {mem_data_out[3], mem_data_out[2], mem_data_out[1], mem_data_out[0]}; 
                     valid[ea] <= 1;
                     dirty[ea] <= 0;

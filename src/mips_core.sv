@@ -10,7 +10,7 @@ module mips_core (
     rst_b
 );
     input   [31:0] inst;
-    input   [7:0]  mem_data_out[0:3];
+    input   [7:0]   mem_data_out [0:3];
     input          clk;
     input          rst_b;
 
@@ -39,6 +39,8 @@ module mips_core (
     wire [7:0] cache_data_out_WB[0:3];
     wire [1:0] mem_block_MEM, mem_block_WB;
     wire is_LB_SB_WB, mem_to_reg_WB;
+    wire [31:0] saved_val_ID, saved_val_EXE, saved_val_MEM;
+    wire is_SW_SB_ID, is_SW_SB_EXE, is_SW_SB_MEM;
 
 
     assign halted = halted_WB;
@@ -99,6 +101,7 @@ module mips_core (
         .dest_reg_num(dest_reg_num_ID),
         .val1(val1_ID),
         .val2(val2_ID),
+        .saved_val(saved_val_ID),
         .zero(zero_ID),
         .is_reg1_valid(is_reg1_valid_ID),
         .is_reg2_valid(is_reg2_valid_ID),
@@ -109,6 +112,7 @@ module mips_core (
         .cache_en(cache_en_ID),
         .mem_to_reg(mem_to_reg_ID),
         .is_LB_SB(is_LB_SB_ID),
+        .is_SW_SB(is_SW_SB_ID),
         .reg_write(reg_write_ID),
         .mem_write(mem_write_ID),
         // inputs
@@ -130,8 +134,10 @@ module mips_core (
         .control(control_EXE),
         // ----- MEM -----
         .mem_write(mem_write_EXE),
-        .is_LB_SB(is_LB_SB_EXE),
+        .is_LB_SB( is_LB_SB_EXE),
         .cache_en(cache_en_EXE),
+        .saved_val(saved_val_EXE),
+        .is_SW_SB(is_SW_SB_EXE),
         // ----- WB ------
         .mem_to_reg(mem_to_reg_EXE),
         .jump(jump_EXE),
@@ -150,6 +156,8 @@ module mips_core (
         .mem_write_in(mem_write_ID),
         .is_LB_SB_in(is_LB_SB_ID),
         .cache_en_in(cache_en_ID),
+        .saved_val_in(saved_val_ID),
+        .is_SW_SB_in(is_SW_SB_ID),
         // ----- WB ------
         .mem_to_reg_in(mem_to_reg_ID),
         .jump_in(jump_ID),
@@ -177,7 +185,9 @@ module mips_core (
         .mem_write(mem_write_MEM),
         .alu_result(alu_result_MEM),
         .is_LB_SB(is_LB_SB_MEM),
+        .is_SW_SB(is_SW_SB_MEM),
         .val2(val2_MEM),
+        .saved_val(saved_val_MEM),
         .cache_en(cache_en_MEM),
         // ----- WB ------
         .mem_to_reg(mem_to_reg_MEM),
@@ -193,7 +203,9 @@ module mips_core (
         .mem_write_in(mem_write_EXE),
         .alu_result_in(alu_result_EXE),
         .is_LB_SB_in(is_LB_SB_EXE),
+        .is_SW_SB_in(is_SW_SB_EXE),
         .val2_in(val2_EXE),
+        .saved_val_in(saved_val_EXE),
         .cache_en_in(cache_en_EXE),
         // ----- WB ------
         .mem_to_reg_in(mem_to_reg_EXE),
@@ -217,9 +229,11 @@ module mips_core (
         .clk(clk),
         .rst_b(rst_b),
         .mem_write(mem_write_MEM),
-        .alu_result(32'h1000),
+        .alu_result(alu_result_MEM),
         .is_LB_SB(is_LB_SB_MEM),
+        .is_SW_SB(is_SW_SB_MEM),
         .rt_data(val2_MEM),
+        .saved_val(saved_val_MEM),
         .mem_data_out(mem_data_out),
         .cache_en(cache_en_MEM)
     );
@@ -273,29 +287,8 @@ module mips_core (
             clk_count <= 0;
         else begin
             $display("-----------------CORE(%d)---------------", clk_count);
-
-            $display("dest_reg_data_WB= %b", dest_reg_data_WB);
-            $display("is_LB_SB_WB= %b", is_LB_SB_WB);
-            $display("cache_data_out_WB= %b", cache_data_out_WB);
-            $display("mem_block_WB= %b", mem_block_WB);
-            $display("mem_to_reg_WB= %b", mem_to_reg_WB);
-            $display("jump_WB= %b", jump_WB);
-            $display("pc_WB= %b", pc_WB);
-            $display("alu_result_WB= %b", alu_result_WB);
-            $display("dest_reg_num_WB= %b", dest_reg_num_WB);
-            $display("reg_write_WB= %b", reg_write_WB);
-            // $display("cache_data_out_MEM= %b", {cache_data_out_MEM[0],cache_data_out_MEM[1],cache_data_out_MEM[2],cache_data_out_MEM[3]});
-            // $display("mem_data_in= %b", mem_data_in);
-            // $display("mem_write_en= %b", mem_write_en);
-            // $display("mem_addr= %b", mem_addr);
-            // $display("mem_block_MEM= %b", mem_block_MEM);
-            // $display("mem_write_MEM= %b", mem_write_MEM);
-            // $display("alu_result_MEM= %b", alu_result_MEM);
-            // $display("is_LB_SB_MEM= %b", is_LB_SB_MEM);
-            // $display("val2_MEM= %b", val2_MEM);
-            // $display("mem_data_out= %b", mem_data_out);
-            // $display("cache_en_MEM= %b", cache_en_MEM);
-        
+            $display("inst= %b", inst);      
+            $display("inst_addr= %b", inst_addr);      
             clk_count <= clk_count + 1;
         end
     end
