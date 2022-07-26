@@ -144,7 +144,7 @@ module floating_point_alu(
                 default: result_real = 0;
         endcase
 
-        // $display("result_Real=%f", result_real);
+        $display("result_Real=%f", result_real);
 
         result_sign = result_real > 0? 0 : 1;
         result_real = result_real < 0? -result_real: result_real;
