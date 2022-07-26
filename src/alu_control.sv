@@ -1,5 +1,6 @@
 module alu_control(
     control,
+    alu_select,
     alu_op,
     func
 );
@@ -8,8 +9,10 @@ module alu_control(
     input [FUNCT_LENGTH-1:0]    func;
     input [ALU_OP_LENTH-1:0]    alu_op;
     output reg [CONTROL_LENGTH-1:0] control;
+    output reg alu_select;
 
     always@(*) begin
+        alu_select = 0;
         if (alu_op == 0) begin // R-type
             case (func)
                 6'b100110: control = 5;
@@ -28,6 +31,34 @@ module alu_control(
                 6'b100100: control = 4;
                 6'b100000: control = 0;
                 6'b000011: control = 12;
+                6'b111111: begin
+                    control = 0;
+                    alu_select = 1;
+                end
+                6'b111110: begin
+                    control = 1;
+                    alu_select = 1;
+                end
+                6'b111101: begin
+                    control = 2;
+                    alu_select = 1;
+                end
+                6'b111011: begin
+                    control = 3;
+                    alu_select = 1;
+                end
+                6'b110111: begin
+                    control = 4;
+                    alu_select = 1;
+                end
+                6'b101111: begin
+                    control = 5;
+                    alu_select = 1;
+                end
+                6'b011111: begin
+                    control = 6;
+                    alu_select = 1;
+                end
                 default: control = 0;
             endcase
         end else begin

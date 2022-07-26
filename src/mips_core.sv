@@ -66,6 +66,19 @@ module mips_core(
     wire [7:0]  cache_data_in[0:3];
     wire        cache_en;
 
+
+    wire [31:0] int_alu_result;
+    wire        int_alu_zero;
+
+    wire [31:0] flaot_alu_result;
+    wire        float_alu_zero;
+
+    wire alu_select;
+
+    wire DBZ, QNAN, SNAN, Inexact, Underflow, Overflow;
+
+
+
     regfile regfile_unit(
         .rs_data(rs_data),
         .rt_data(rt_data),
@@ -99,16 +112,31 @@ module mips_core(
 
     alu_control alu_control_unit(
         .control(control),
+        .alu_select(alu_select),
         .alu_op(alu_op),
         .func(func)
     );
     
     alu alu_unit(
-        .alu_result(alu_result),
-        .zero(zero),
+        .alu_result(int_alu_result),
+        .zero(int_alu_zero),
         .a(a), 
         .b(b),
         .control(control)
+    );
+
+    floating_point_alu falu(
+        .falu_result(flaot_alu_result),
+        .zero(float_alu_zero),
+        .a(a),
+        .b(b),
+        .opcode(control),
+        .DBZ(DBZ),
+        .QNAN(QNAN),
+        .SNAN(SNAN),
+        .Inexact(Inexact),
+        .Underflow(Underflow),
+        .Overflow(Overflow)
     );
 
     pc_control pc_control(
@@ -137,6 +165,9 @@ module mips_core(
         .clk(clk),
         .rst_b(rst_b)
     );
+
+    assign alu_result = alu_select? flaot_alu_result : int_alu_result;
+    assign zero = alu_select? float_alu_zero : int_alu_zero;
 
     assign rs_num = inst[25:21];
     assign rt_num = inst[20:16];
