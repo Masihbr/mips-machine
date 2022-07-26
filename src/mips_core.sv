@@ -210,6 +210,8 @@ module mips_core(
         // $display("hit=%b\ncache_data_out=%h\nmem_data_in=%h\nmem_write_en=%b\ncache_addr=%d\nmem_addr=%d\ncache_data_in=%h\nmem_data_out=%h\ncache_write_en=%b\ncache_en=%b\nclkcount=%d", hit,{cache_data_out[0],cache_data_out[1],cache_data_out[2],cache_data_out[3]},{mem_data_in[0],mem_data_in[1],mem_data_in[2],mem_data_in[3]},mem_write_en,cache_addr,mem_addr,{cache_data_in[0],cache_data_in[1],cache_data_in[2],cache_data_in[3]},{mem_data_out[0],mem_data_out[1],mem_data_out[2],mem_data_out[3]},cache_write_en,cache_en,clk_count);        
         // $display("-----------------------------------------");
         // end
+        if (opcode == 6'b000000)
+            $display("opcode=%b\ncontrol=%b\nalu_result=%b\na=%b\nb=%b\nalu_select=%b", opcode, control, alu_result,a , b, alu_select);
         if (rst_b == 0) begin
             pc <= 0;
             clk_count <=0;

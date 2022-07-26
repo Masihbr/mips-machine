@@ -79,11 +79,13 @@ module floating_point_alu(
                 a_real_exp *= 2;
         end
 
-        temp = 4194304;
+        temp = 1 << 23;
 
         a_real = temp + real'(a_mantis);
         a_real = (a_real / temp) * a_real_exp;
         a_real = a_sign? a_real * (-1) : a_real;
+
+        // $display("a_real=%f", a_real);
         
         b_real_exp = 1;
         if (b_exponent < 127) begin
@@ -98,6 +100,9 @@ module floating_point_alu(
         b_real = temp + real'(b_mantis);
         b_real = (b_real / temp) * b_real_exp;
         b_real = b_sign? b_real * (-1) : b_real;
+
+        // $display("b_real=%f", b_real);
+
 
         case (opcode)
                 4'b0000: result_real = a_real + b_real;
@@ -134,6 +139,8 @@ module floating_point_alu(
                 default: result_real = 0;
         endcase
 
+        // $display("result_Real=%f", result_real);
+
         result_sign = result_real > 0? 0 : 1;
         result_real = result_real < 0? -result_real: result_real;
 
@@ -155,7 +162,7 @@ module floating_point_alu(
         end
 
         else begin
-            while (alt > 2) begin
+            while (alt >= 2) begin
                 if (result_exponent == 8'b11111111) begin
                     Overflow = 1;
                     break;
