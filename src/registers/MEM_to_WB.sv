@@ -83,20 +83,20 @@ always @ (posedge clk, negedge rst_b) begin
             reg_write <= reg_write_in;
             halted <= halted_in;
         end
-        // // // // $display("------------------MEM TO WB(%d)--------------", clk_count);
-        // // // // $display("is_LB_SB_in= %b", is_LB_SB_in);
-        // // // // $display("cache_data_out_in= %b", cache_data_out_in);
-        // // // // $display("mem_block_in= %b", mem_block_in);
-        // // // // $display("mem_to_reg_in= %b", mem_to_reg_in);
-        // // // // $display("jump_in= %b", jump_in);
-        // // // // $display("pc_in= %b", pc_in);
-        // // // // $display("alu_result_in= %b", alu_result_in);
-        // // // // $display("inst_in= %b", inst_in);
-        // // // // $display("reg_dst_in= %b", reg_dst_in);
-        // // // // $display("reg_write_in= %b", reg_write_in);
-        // // // // $display("clk= %b", clk);
-        // // // // $display("rst_b= %b", rst_b);
-        // // // // $display("freeze= %b", freeze);
+        // $display("------------------MEM TO WB(%d)--------------", clk_count);
+        // $display("is_LB_SB_in= %b", is_LB_SB_in);
+        // $display("cache_data_out_in= %b", cache_data_out_in);
+        // $display("mem_block_in= %b", mem_block_in);
+        // $display("mem_to_reg_in= %b", mem_to_reg_in);
+        // $display("jump_in= %b", jump_in);
+        // $display("pc_in= %b", pc_in);
+        // $display("alu_result_in= %b", alu_result_in);
+        // $display("inst_in= %b", inst_in);
+        // $display("reg_dst_in= %b", reg_dst_in);
+        // $display("reg_write_in= %b", reg_write_in);
+        // $display("clk= %b", clk);
+        // $display("rst_b= %b", rst_b);
+        // $display("freeze= %b", freeze);
     end
   end
 

@@ -29,11 +29,11 @@ module IF_to_ID (
             clk_count <= 0;
         end
         else begin
-            // // // // $display("-------------IF TO ID(%d)-------------", clk_count);
-            // // // // $display("inst_in= %b", inst_in);
-            // // // // $display("pc_in= %b", pc_in);
-            // // // // $display("freeze= %b", freeze);
-            // // // // $display("flush= %b", flush);
+            // $display("-------------IF TO ID(%d)-------------", clk_count);
+            // $display("inst_in= %b", inst_in);
+            // $display("pc_in= %b", pc_in);
+            // $display("freeze= %b", freeze);
+            // $display("flush= %b", flush);
             clk_count <= clk_count + 1;
             if (!freeze) begin
                 if (flush) begin

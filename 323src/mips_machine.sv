@@ -22,7 +22,6 @@ module mips_machine(
         .inst_addr(inst_addr), 
         .mem_addr(mem_addr), 
         .mem_data_out(mem_data_out_d4),
-        // .mem_data_out(mem_data_out),
         .mem_data_in(mem_data_in),
         .mem_write_en(mem_write_en),
         .halted(halted),
@@ -74,9 +73,7 @@ module mips_machine(
         .data_out(mem_data_out), 
         .addr(mem_addr), 
         .data_in(mem_data_in_d4), 
-        // .data_in(mem_data_in), 
         .we(mem_we_d4), 
-        // .we(mem_write_en), 
         .clk(clk), 
         .rst_b(rst_b)
     );

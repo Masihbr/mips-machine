@@ -44,7 +44,7 @@ module mips_core (
     wire has_reg1_hazard_ID, has_reg2_hazard_ID, has_saved_val_hazard_ID;
     wire [31:0] reg1_selected_data, reg2_selected_data, saved_val_selected_data;
     wire is_reg1_EXE_hazard, is_reg2_EXE_hazard, is_reg1_MEM_hazard, is_reg2_MEM_hazard, is_reg1_WB_hazard, is_reg2_WB_hazard;
-    wire flush_IF;
+    wire flush_IF, freeze_MEM;
     
     assign halted = halted_WB;
 
@@ -127,8 +127,8 @@ module mips_core (
         .inst(inst_ID),
         .cache_en(cache_en_ID),
         .sign_extend_immediate(sign_extend_immediate_ID ),
-        .freeze(1'b0),
-        .hit(1'b1)
+        .freeze(freeze_MEM),
+        .hit(hit_MEM)
     );
 
     IF_to_ID IF_to_ID (
@@ -141,7 +141,7 @@ module mips_core (
         .clk(clk),
         .rst_b(rst_b),
         .flush(flush_IF),
-        .freeze(1'b0)
+        .freeze(freeze_MEM)
     );
 
     ID_stage ID_stage (
@@ -219,7 +219,7 @@ module mips_core (
         .dest_reg_num_in(dest_reg_num_ID),
         .reg_write_in(reg_write_ID),
         .halted_in(halted_ID),
-        .freeze(1'b0)
+        .freeze(freeze_MEM)
     );
 
     EXE_stage EXE_stage (
@@ -268,12 +268,13 @@ module mips_core (
         .dest_reg_num_in(dest_reg_num_EXE),
         .reg_write_in(reg_write_EXE),
         .halted_in(halted_EXE),
-        .freeze(1'b0)
+        .freeze(freeze_MEM)
     );
 
     MEM_stage MEM_stage (
         // outputs
         .hit(hit_MEM),
+        .freeze(freeze_MEM),
         .cache_data_out(cache_data_out_MEM),
         .mem_data_in(mem_data_in),
         .mem_write_en(mem_write_en),
@@ -340,7 +341,7 @@ module mips_core (
         if (!rst_b)
             clk_count <= 0;
         else begin
-            // // $display("-----------------CORE(%d)---------------", clk_count);
+            $display("-----------------CORE(%d)---------------", clk_count);
              // // $display("inst= %b", inst);      
             // // $display("inst_addr= %b", inst_addr);
             // // $display("reg1_selected_data= %b", reg1_selected_data);
@@ -357,6 +358,7 @@ module mips_core (
             // // $display("is_reg2_MEM_hazard= %b", is_reg2_MEM_hazard);
             // // $display("alu_result_EXE= %b", alu_result_EXE);
             // // $display("alu_result_MEM= %b", alu_result_MEM );     
+            
             clk_count <= clk_count + 1;
         end
     end

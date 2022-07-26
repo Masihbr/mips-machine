@@ -1,4 +1,4 @@
-module cache(
+module cache (
     hit,
     cache_data_out,
     mem_data_in,
@@ -13,19 +13,19 @@ module cache(
     rst_b
 );
 
-    output      [7:0]   cache_data_out[0:3];
-    output reg  [7:0]   mem_data_in[0:3];
-    output reg          mem_write_en;
-    output              hit;
-    output reg  [31:0]  mem_addr;
+    output     [7:0]  cache_data_out[0:3];
+    output            hit;
+    output reg [7:0]  mem_data_in[0:3];
+    output reg        mem_write_en;
+    output reg [31:0] mem_addr;
 
-    input          cache_en;
-    input  [7:0]   mem_data_out[0:3];
-    input  [7:0]   cache_data_in[0:3];
-    input          cache_write_en;
-    input          rst_b;
-    input          clk;
-    input  [31:0]  cache_addr;
+    input        cache_en;
+    input [7:0]  mem_data_out[0:3];
+    input [7:0]  cache_data_in[0:3];
+    input        cache_write_en;
+    input        rst_b;
+    input        clk;
+    input [31:0] cache_addr;
 
     parameter blocks_number = 11;
     parameter word_size = 32; 
@@ -45,19 +45,16 @@ module cache(
 
     assign {cache_data_out[3], cache_data_out[2], cache_data_out[1], cache_data_out[0]} = data[ea]; 
 
+    assign hit = (valid[ea] && tag[ea] == input_tag) || (tag[ea]!= input_tag && ((dirty[ea] && counter == 5) || (!dirty[ea] && counter == 4))) || (!valid[ea] && counter == 4);
+    
     integer i;
-
-    // assign hit = 
-    // (valid[ea] && tag[ea] == input_tag) || (tag[ea]!= input_tag && ((dirty[ea] && counter == 1) || (!dirty[ea] && counter == 0))) || (!valid[ea] && counter == 0);
-
-    assign hit = 1;
     integer clk_count;
     always_ff @(posedge clk, negedge rst_b) begin
         // integer i;
-        // // $display("---------------CACHE(%d)------------", clk_count);
+        // $display("---------------CACHE(%d)------------", clk_count);
         // for(i = start; i<= top ; i++) begin
         //     if(data[i] != 0)
-        //     // $display("data[%d] = %b", i, data[i]);
+            // $display("data[%d] = %b", i, data[i]);
         // end
         if (rst_b == 0) begin
             clk_count <= 0;
@@ -85,7 +82,7 @@ module cache(
                         mem_addr <= cache_addr;
                         mem_write_en <= 0;
 
-                        if ((dirty[ea] && counter == 1) || (!dirty[ea] && counter == 0)) begin
+                        if ((dirty[ea] && counter == 5) || (!dirty[ea] && counter == 4)) begin
                             data[ea] <= {mem_data_out[3], mem_data_out[2], mem_data_out[1], mem_data_out[0]}; 
                             valid[ea] <= 1;
                             dirty[ea] <= 0;
@@ -98,7 +95,7 @@ module cache(
                 end
             end else begin
                 mem_addr <= cache_addr;
-                if (counter == 0) begin
+                if (counter == 4) begin
                     data[ea] <= {mem_data_out[3], mem_data_out[2], mem_data_out[1], mem_data_out[0]}; 
                     valid[ea] <= 1;
                     dirty[ea] <= 0;
