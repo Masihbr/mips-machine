@@ -79,24 +79,24 @@ module ID_to_EXE (
       {val1, val2, control, is_LB_SB, mem_to_reg, jump, mem_write, cache_en, pc, reg_write, dest_reg_num, halted, saved_val, is_SW_SB} <= 0;
     end
     else begin
-      // // $display("------------------ID TO EXE(%d)--------------", clk_count);
-      // // $display("val1_in= %b", val1_in);
-      // // $display("val2_in= %b", val2_in);
-      // // $display("control_in= %b", control_in);
-      // // $display("mem_write_in= %b", mem_write_in);
-      // // $display("is_LB_SB_in= %b", is_LB_SB_in);
-      // // $display("rt_data_in= %b", rt_data_in);
-      // // $display("cache_en_in= %b", cache_en_in);
-      // // $display("mem_to_reg_in= %b", mem_to_reg_in);
-      // // $display("jump_in= %b", jump_in);
-      // // $display("pc_in= %b", pc_in);
-      // // $display("inst_in= %b", inst_in);
-      // // $display("dest= %b", (reg_dst_in == 1'b1) ? inst_in[15:11] : (jump_in == 2'b10) ? 5'd31 : inst_in[20:16]);
-      // // $display("reg_dst_in= %b", reg_dst_in);
-      // // $display("reg_write_in= %b", reg_write_in);
-      // // $display("clk= %b", clk);
-      // // $display("rst_b= %b", rst_b);
-      // // $display("freeze= %b", freeze);
+      // // // // $display("------------------ID TO EXE(%d)--------------", clk_count);
+      // // // // $display("val1_in= %b", val1_in);
+      // // // // $display("val2_in= %b", val2_in);
+      // // // // $display("control_in= %b", control_in);
+      // // // // $display("mem_write_in= %b", mem_write_in);
+      // // // // $display("is_LB_SB_in= %b", is_LB_SB_in);
+      // // // // $display("rt_data_in= %b", rt_data_in);
+      // // // // $display("cache_en_in= %b", cache_en_in);
+      // // // // $display("mem_to_reg_in= %b", mem_to_reg_in);
+      // // // // $display("jump_in= %b", jump_in);
+      // // // // $display("pc_in= %b", pc_in);
+      // // // // $display("inst_in= %b", inst_in);
+      // // // // $display("dest= %b", (reg_dst_in == 1'b1) ? inst_in[15:11] : (jump_in == 2'b10) ? 5'd31 : inst_in[20:16]);
+      // // // // $display("reg_dst_in= %b", reg_dst_in);
+      // // // // $display("reg_write_in= %b", reg_write_in);
+      // // // // $display("clk= %b", clk);
+      // // // // $display("rst_b= %b", rst_b);
+      // // // // $display("freeze= %b", freeze);
 
       clk_count <= clk_count + 1;
         if (~freeze) begin

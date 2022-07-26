@@ -31,11 +31,11 @@ module EXE_stage (
         if(!rst_b )
             clk_count <= 0;
         else begin
-            $display("-----------------EXE stage(%d)-------------------", clk_count);
-            $display("val1= %b", val1);
-            $display("val2= %b", val2);
-            $display("control= %b", control);
-            $display("alu_result=%b",alu_result);            
+            // // $display("-----------------EXE stage(%d)-------------------", clk_count);
+            // // $display("val1= %b", val1);
+            // // $display("val2= %b", val2);
+            // // $display("control= %b", control);
+            // // $display("alu_result=%b",alu_result);            
             clk_count <= clk_count + 1;
         end
     end

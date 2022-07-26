@@ -51,8 +51,16 @@ module cache(
     // (valid[ea] && tag[ea] == input_tag) || (tag[ea]!= input_tag && ((dirty[ea] && counter == 1) || (!dirty[ea] && counter == 0))) || (!valid[ea] && counter == 0);
 
     assign hit = 1;
+    integer clk_count;
     always_ff @(posedge clk, negedge rst_b) begin
+        // integer i;
+        // // $display("---------------CACHE(%d)------------", clk_count);
+        // for(i = start; i<= top ; i++) begin
+        //     if(data[i] != 0)
+        //     // $display("data[%d] = %b", i, data[i]);
+        // end
         if (rst_b == 0) begin
+            clk_count <= 0;
             counter <= 0;
             for (i = start; i <= top; i++) begin
                 data[i] <= 0;
@@ -60,7 +68,8 @@ module cache(
                 tag[i] <= 0;
             end
         end
-        else if (cache_en) begin   
+        else if (cache_en) begin
+            clk_count <= clk_count + 1; 
             if (valid[ea]) begin
                 if (tag[ea] == input_tag) begin
                     counter <= 0;

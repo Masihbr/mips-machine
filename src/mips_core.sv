@@ -10,7 +10,7 @@ module mips_core (
     rst_b
 );
     input   [31:0] inst;
-    input   [7:0]   mem_data_out [0:3];
+    input   [7:0]  mem_data_out [0:3];
     input          clk;
     input          rst_b;
 
@@ -41,9 +41,60 @@ module mips_core (
     wire is_LB_SB_WB, mem_to_reg_WB;
     wire [31:0] saved_val_ID, saved_val_EXE, saved_val_MEM;
     wire is_SW_SB_ID, is_SW_SB_EXE, is_SW_SB_MEM;
-
-
+    wire has_reg1_hazard_ID, has_reg2_hazard_ID, has_saved_val_hazard_ID;
+    wire [31:0] reg1_selected_data, reg2_selected_data, saved_val_selected_data;
+    wire is_reg1_EXE_hazard, is_reg2_EXE_hazard, is_reg1_MEM_hazard, is_reg2_MEM_hazard, is_reg1_WB_hazard, is_reg2_WB_hazard;
+    wire flush_IF;
+    
     assign halted = halted_WB;
+
+    hazard_detector hazard_detector (
+        // outputs
+        .has_reg1_hazard_ID(has_reg1_hazard_ID),
+        .has_reg2_hazard_ID(has_reg2_hazard_ID),
+        .has_saved_val_hazard_ID(has_saved_val_hazard_ID),
+        .is_reg1_EXE_hazard(is_reg1_EXE_hazard),
+        .is_reg1_MEM_hazard(is_reg1_MEM_hazard),
+        .is_reg1_WB_hazard(is_reg1_WB_hazard),
+        .is_reg2_EXE_hazard(is_reg2_EXE_hazard),
+        .is_reg2_MEM_hazard(is_reg2_MEM_hazard),
+        .is_reg2_WB_hazard(is_reg2_WB_hazard),
+        // inputs
+        .dest_reg_num_EXE(dest_reg_num_EXE),
+        .reg_write_EXE(reg_write_EXE),
+        .dest_reg_num_MEM(dest_reg_num_MEM),
+        .reg_write_MEM(reg_write_MEM),
+        .dest_reg_num_WB(dest_reg_num_WB),
+        .reg_write_WB(reg_write_WB),
+        .reg1_num_ID(reg1_num_ID),
+        .reg2_num_ID(reg2_num_ID),
+        .is_reg1_valid_ID(is_reg1_valid_ID),
+        .is_reg2_valid_ID(is_reg2_valid_ID),
+        .is_SW_SB_ID(is_SW_SB_ID)
+    );
+
+    forwarding forwarding (
+        // outputs
+        .reg1_selected_data(reg1_selected_data),
+        .reg2_selected_data(reg2_selected_data),
+        .saved_val_selected_data(saved_val_selected_data),
+        // inputs
+        .reg1_data(reg1_data_ID),
+        .reg2_data(reg2_data_ID),
+        .has_reg1_hazard(has_reg1_hazard_ID),
+        .has_reg2_hazard(has_reg2_hazard_ID),
+        .has_saved_val_hazard(has_saved_val_hazard_ID),
+        .is_reg1_EXE_hazard(is_reg1_EXE_hazard),
+        .is_reg1_MEM_hazard(is_reg1_MEM_hazard),
+        .is_reg1_WB_hazard(is_reg1_WB_hazard),
+        .is_reg2_EXE_hazard(is_reg2_EXE_hazard),
+        .is_reg2_MEM_hazard(is_reg2_MEM_hazard),
+        .is_reg2_WB_hazard(is_reg2_WB_hazard),
+        .EXE_data(alu_result_EXE),
+        .MEM_data(alu_result_MEM),
+        .WB_data(alu_result_WB)
+    );
+
 
 
     regfile regfile_unit (
@@ -64,6 +115,7 @@ module mips_core (
     IF_stage IF_stage (
         // outputs
         .pc(inst_addr),
+        .flush(flush_IF),
         // inputs
         .clk(clk),
         .rst_b(rst_b),
@@ -76,7 +128,7 @@ module mips_core (
         .cache_en(cache_en_ID),
         .sign_extend_immediate(sign_extend_immediate_ID ),
         .freeze(1'b0),
-         .hit(1'b1)
+        .hit(1'b1)
     );
 
     IF_to_ID IF_to_ID (
@@ -88,7 +140,7 @@ module mips_core (
         .inst_in(inst),
         .clk(clk),
         .rst_b(rst_b),
-        .flush(1'b0),
+        .flush(flush_IF),
         .freeze(1'b0)
     );
 
@@ -119,10 +171,12 @@ module mips_core (
         .clk(clk),
         .rst_b(rst_b),
         .inst(inst_ID),
-        .reg1_data(reg1_data_ID),
-        .reg2_data(reg2_data_ID),
-        .has_reg1_hazard(),
-        .has_reg2_hazard()
+        .reg1_data(reg1_selected_data),
+        .reg2_data(reg2_selected_data),
+        .saved_val_data(saved_val_selected_data),
+        .has_reg1_hazard(has_reg1_hazard_ID),
+        .has_reg2_hazard(has_reg2_hazard_ID),
+        .has_saved_val_hazard(has_saved_val_hazard_ID)
     );
 
 
@@ -286,9 +340,23 @@ module mips_core (
         if (!rst_b)
             clk_count <= 0;
         else begin
-            $display("-----------------CORE(%d)---------------", clk_count);
-            $display("inst= %b", inst);      
-            $display("inst_addr= %b", inst_addr);      
+            // // $display("-----------------CORE(%d)---------------", clk_count);
+             // // $display("inst= %b", inst);      
+            // // $display("inst_addr= %b", inst_addr);
+            // // $display("reg1_selected_data= %b", reg1_selected_data);
+            // // $display("reg2_selected_data= %b", reg2_selected_data);
+            // // $display("saved_val_selected_data= %b", saved_val_selected_data);
+            // // $display("reg1_data_ID= %b", reg1_data_ID);
+            // // $display("reg2_data_ID= %b", reg2_data_ID);
+            // // $display("has_reg1_hazard_ID= %b", has_reg1_hazard_ID);
+            // // $display("has_reg2_hazard_ID= %b", has_reg2_hazard_ID);
+            // // $display("has_saved_val_hazard_ID= %b", has_saved_val_hazard_ID);
+            // // $display("is_reg1_EXE_hazard= %b", is_reg1_EXE_hazard);
+            // // $display("is_reg1_MEM_hazard= %b", is_reg1_MEM_hazard);
+            // // $display("is_reg2_EXE_hazard= %b", is_reg2_EXE_hazard);
+            // // $display("is_reg2_MEM_hazard= %b", is_reg2_MEM_hazard);
+            // // $display("alu_result_EXE= %b", alu_result_EXE);
+            // // $display("alu_result_MEM= %b", alu_result_MEM );     
             clk_count <= clk_count + 1;
         end
     end

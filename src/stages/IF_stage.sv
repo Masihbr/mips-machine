@@ -1,6 +1,7 @@
 module IF_stage(
     // outputs
     pc,
+    flush,
     // inputs
     clk,
     rst_b,
@@ -30,6 +31,7 @@ module IF_stage(
     input            freeze;
     
     output reg [31:0] pc;
+    output            flush;
 
     wire [31:0] next_pc;
     wire [25:0] address;
@@ -38,6 +40,7 @@ module IF_stage(
 
     pc_control pc_control(
         .next_pc(next_pc),
+        .flush(flush),
         .pc(pc),
         .address(address),
         .jump(jump),
@@ -55,9 +58,9 @@ module IF_stage(
             pc <= 0;
         end
         else begin
-            $display("-------------------------- IF STAGE(%d) ---------------------", clk_count);
-            $display("pc= %b", pc);
-            $display("inst= %b",inst);
+            // // $display("-------------------------- IF STAGE(%d) ---------------------", clk_count);
+            // // $display("pc= %b", pc);
+            // // $display("inst= %b",inst);
             clk_count <= clk_count + 1;
             if (!freeze) begin
                 pc <= next_pc;           
