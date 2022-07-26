@@ -28,9 +28,7 @@ module ID_stage (
     saved_val_data,
     has_reg1_hazard,
     has_reg2_hazard,
-    has_saved_val_hazard,
-    clk,
-    rst_b
+    has_saved_val_hazard
 );
     output        halted;
     output [31:0] sign_extend_immediate;
@@ -61,10 +59,7 @@ module ID_stage (
     input        has_reg1_hazard;
     input        has_reg2_hazard;
     input        has_saved_val_hazard;
-    input        clk;
-    input        rst_b;
      
-
     wire [5:0]  opcode;
     wire [4:0]  rs_num, rt_num, rd_num;
     wire [4:0]  sh_amount;
@@ -90,7 +85,6 @@ module ID_stage (
     assign reg2_num = rt_num;
     assign dest_reg_num = dest_reg_sel ? rd_num : (jump == 2'b10) ? 5'd31 : rt_num;
 
-    // assign correct_reg1_data = has_reg1_hazard
     assign val1 = is_reg1_valid ? reg1_data : {{27{1'b0}}, sh_amount};
     assign val2 = (is_reg2_valid && !is_SW_SB) ? reg2_data : sign_extend_immediate;
     assign saved_val = is_SW_SB ? saved_val_data : 32'd0;
@@ -125,41 +119,4 @@ module ID_stage (
         .alu_op(alu_op),
         .func(func)
     );
-
-    integer clk_count;
-    always_ff @(posedge clk, negedge rst_b) begin
-        if (!rst_b)
-            clk_count <= 0;
-        else begin
-            clk_count <= clk_count + 1;
-            // $display("------------------- ID STAGE(%d) ---------------", clk_count);
-            // $display("reg1_num= %b", reg1_num);
-            // $display("has_reg1_hazard= %b", has_reg1_hazard);
-            // $display("reg1_data= %b", reg1_data);
-            // $display("reg2_num= %b", reg2_num);
-            // $display("has_reg2_hazard= %b", has_reg2_hazard);
-            // $display("reg2_data= %b", reg2_data);
-            // $display("saved_val= %b", saved_val);
-            // $display("has_saved_val_hazard= %b", has_saved_val_hazard);
-            // $display("saved_val_data= %b", saved_val_data);
-            // $display("dest_reg_num= %b", dest_reg_num);
-            // $display("halted= %b", halted);
-            // $display("sign_extend_immediate= %b", sign_extend_immediate);
-            // $display("val1= %b", val1);
-            // $display("val2= %b", val2);
-            // $display("zero= %b", zero);
-            // $display("is_reg1_valid= %b", is_reg1_valid);
-            // $display("is_reg2_valid= %b", is_reg2_valid);
-            // $display("control= %b", control);
-            // $display("jump= %b", jump);
-            // $display("branch= %b", branch);
-            // $display("jr= %b", jr);
-            // $display("cache_en= %b", cache_en);
-            // $display("is_LB_SB= %b", is_LB_SB);
-            // $display("mem_write= %b", mem_write);
-            // $display("reg_write= %b", reg_write);
-            // $display("mem_to_reg= %b", mem_to_reg);
-        end
-    end
-    
 endmodule

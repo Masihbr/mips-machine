@@ -30,18 +30,21 @@ module forwarding
     reg1_selected_data = reg1_data;
     reg2_selected_data = reg2_data;
     saved_val_selected_data = reg2_data;
+    
     // reg1
     if (has_reg1_hazard) begin
       if (is_reg1_EXE_hazard) reg1_selected_data = EXE_data;
       else if (is_reg1_MEM_hazard) reg1_selected_data = MEM_data;
       else if (is_reg1_WB_hazard) reg1_selected_data = WB_data;
     end else reg1_selected_data = reg1_data;
+
     // reg2
     if (has_reg2_hazard) begin
       if (is_reg2_EXE_hazard) reg2_selected_data = EXE_data;
       else if (is_reg2_MEM_hazard) reg2_selected_data = MEM_data;
       else if (is_reg2_WB_hazard) reg2_selected_data = WB_data;
     end else reg2_selected_data = reg2_data;
+
     // saved_val
     if (has_saved_val_hazard) begin
       if (is_reg2_EXE_hazard) saved_val_selected_data = EXE_data;

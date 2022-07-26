@@ -127,8 +127,7 @@ module mips_core (
         .inst(inst_ID),
         .cache_en(cache_en_ID),
         .sign_extend_immediate(sign_extend_immediate_ID ),
-        .freeze(freeze_MEM),
-        .hit(hit_MEM)
+        .freeze(freeze_MEM)
     );
 
     IF_to_ID IF_to_ID (
@@ -168,8 +167,6 @@ module mips_core (
         .reg_write(reg_write_ID),
         .mem_write(mem_write_ID),
         // inputs
-        .clk(clk),
-        .rst_b(rst_b),
         .inst(inst_ID),
         .reg1_data(reg1_selected_data),
         .reg2_data(reg2_selected_data),
@@ -226,8 +223,6 @@ module mips_core (
         // outputs
         .alu_result(alu_result_EXE),
         // inputs
-        .clk(clk),
-        .rst_b(rst_b),
         .val1(val1_EXE),
         .val2(val2_EXE),
         .control(control_EXE)
@@ -325,8 +320,6 @@ module mips_core (
         // outputs
         .dest_reg_data(dest_reg_data_WB),
         // inputs
-        .clk(clk),
-        .rst_b(rst_b),
         .is_LB_SB(is_LB_SB_WB),
         .cache_data_out(cache_data_out_WB),
         .mem_block(mem_block_WB),
@@ -335,33 +328,5 @@ module mips_core (
         .pc(pc_WB),
         .alu_result(alu_result_WB)
     );
-
-    integer clk_count;
-    always_ff @(posedge clk, negedge rst_b) begin
-        if (!rst_b)
-            clk_count <= 0;
-        else begin
-            $display("-----------------CORE(%d)---------------", clk_count);
-             // // $display("inst= %b", inst);      
-            // // $display("inst_addr= %b", inst_addr);
-            // // $display("reg1_selected_data= %b", reg1_selected_data);
-            // // $display("reg2_selected_data= %b", reg2_selected_data);
-            // // $display("saved_val_selected_data= %b", saved_val_selected_data);
-            // // $display("reg1_data_ID= %b", reg1_data_ID);
-            // // $display("reg2_data_ID= %b", reg2_data_ID);
-            // // $display("has_reg1_hazard_ID= %b", has_reg1_hazard_ID);
-            // // $display("has_reg2_hazard_ID= %b", has_reg2_hazard_ID);
-            // // $display("has_saved_val_hazard_ID= %b", has_saved_val_hazard_ID);
-            // // $display("is_reg1_EXE_hazard= %b", is_reg1_EXE_hazard);
-            // // $display("is_reg1_MEM_hazard= %b", is_reg1_MEM_hazard);
-            // // $display("is_reg2_EXE_hazard= %b", is_reg2_EXE_hazard);
-            // // $display("is_reg2_MEM_hazard= %b", is_reg2_MEM_hazard);
-            // // $display("alu_result_EXE= %b", alu_result_EXE);
-            // // $display("alu_result_MEM= %b", alu_result_MEM );     
-            
-            clk_count <= clk_count + 1;
-        end
-    end
-
 
 endmodule

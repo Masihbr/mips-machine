@@ -61,151 +61,146 @@ module control(
         is_SW_SB = 1'b0;
 
         /* verilator lint_off CASEX */
-        // if (!has_hazard) begin
-            casex (opcode)
-                // R-type
-                6'b000000: begin 
-                    dest_reg_write = 1'b1;
-                    dest_reg_sel = 1'b1;
-                    case (func)
-                        6'b000000, 6'b000010, 6'b000011: begin // SLL, SRL, SRA
-                        is_reg1_valid = 1'b0;
-                        alu_op = 4'b0000;
-                        end
-                        6'b001000: begin // jr
-                            is_reg2_valid = 1'b0;
-                            jr = 1'b1;
-                        end
-                        default: begin
-                        end
-                    endcase
-                end
-                // I type
-                6'b001000: begin // ADDi
-                    is_reg2_valid = 1'b0;
-                    dest_reg_write = 1'b1;
-                    alu_op = 4'b0001;
-                    // is_imm = 1'b1;
-                end
-                6'b001001: begin // ADDiu
-                    is_reg2_valid = 1'b0;
-                    dest_reg_write = 1'b1;
-                    is_sign_extended = 1'b0;
-                    alu_op = 4'b0010;
-                    // is_imm = 1'b1;
-                end
-                6'b001100: begin // ANDi
-                    is_reg2_valid = 1'b0;
-                    dest_reg_write = 1'b1;
-                    is_sign_extended = 1'b0;
-                    alu_op = 4'b0011;
-                    // is_imm = 1'b1;
-                end
-
-                6'b001110: begin // XORi
-                    is_reg2_valid = 1'b0;
-                    dest_reg_write = 1'b1;
-                    is_sign_extended = 1'b0;
-                    alu_op = 4'b0100;
-                    // is_imm = 1'b1;
-                end
-                
-                6'b001101: begin // ORi
-                    is_reg2_valid = 1'b0;
-                    dest_reg_write = 1'b1;
-                    is_sign_extended = 1'b0;
-                    alu_op = 4'b0101;
-                    // is_imm = 1'b1;
-                end
-
-                6'b000100, 6'b000101: begin // BEQ, BNE
-                    branch = opcode[2:0];
-                    alu_op = 4'b1000;
-                    // is_imm = 1'b1;
-                end
-
-                6'b000110, 6'b000111: begin // BLEZ, BGTZ
-                    is_reg2_valid = 1'b0;
-                    branch = opcode[2:0];
-                    alu_op = 4'b1000;
-                    // is_imm = 1'b1;
-                end
-
-                6'b000001: begin // BGEZ
-                    is_reg2_valid = 1'b0;
-                    branch = 3'b001;
-                    // is_imm = 1'b1;
-                end
-
-                 6'b100011: begin // LW 
-                    is_reg2_valid = 1'b0;
-                    dest_reg_write = 1'b1;
-
-                    alu_op = 4'b0001;
-                    mem_read = 1'b1; // has no effect
-                    mem_to_reg = 1;
-                    // is_imm = 1'b1;
-                end
-
-                6'b101011: begin // SW
-                    alu_op = 4'b0001;
-                    mem_write = 1'b1;
-                    is_SW_SB = 1'b1;
-                end
-
-                6'b100000: begin // LB
-                    dest_reg_write = 1'b1;
-                    alu_op = 4'b0001;
-                    is_LB_SB = 1'b1;
-                    mem_read = 1'b1; // has no effect
-                    mem_to_reg = 1;
-                    is_reg2_valid = 1'b0;
-                    // is_imm = 1'b1;
-                end
-
-                6'b101000: begin // SB
-                    alu_op = 4'b0001;
-                    is_LB_SB = 1'b1;
-                    mem_write = 1'b1;
-                    is_SW_SB = 1'b1;
-                end
-                
-                
-                6'b001010: begin // SLTi
-                    is_reg2_valid = 1'b0;
-                    dest_reg_write = 1'b1;
-                    alu_op = 4'b0110;
-                    // is_imm = 1'b1;
-                end
-                
-                6'b001111: begin // Lui
+        casex (opcode)
+            // R-type
+            6'b000000: begin 
+                dest_reg_write = 1'b1;
+                dest_reg_sel = 1'b1;
+                case (func)
+                    6'b000000, 6'b000010, 6'b000011: begin // SLL, SRL, SRA
                     is_reg1_valid = 1'b0;
-                    is_reg2_valid = 1'b0;
-                    dest_reg_write = 1'b1;
-                    alu_op = 4'b0111;
-                    // is_imm = 1'b1;
-                end
+                    alu_op = 4'b0000;
+                    end
+                    6'b001000: begin // jr
+                        is_reg2_valid = 1'b0;
+                        jr = 1'b1;
+                    end
+                    default: begin
+                    end
+                endcase
+            end
+            // I type
+            6'b001000: begin // ADDi
+                is_reg2_valid = 1'b0;
+                dest_reg_write = 1'b1;
+                alu_op = 4'b0001;
+                // is_imm = 1'b1;
+            end
+            6'b001001: begin // ADDiu
+                is_reg2_valid = 1'b0;
+                dest_reg_write = 1'b1;
+                is_sign_extended = 1'b0;
+                alu_op = 4'b0010;
+                // is_imm = 1'b1;
+            end
+            6'b001100: begin // ANDi
+                is_reg2_valid = 1'b0;
+                dest_reg_write = 1'b1;
+                is_sign_extended = 1'b0;
+                alu_op = 4'b0011;
+                // is_imm = 1'b1;
+            end
 
-                // J type
-                6'b000010: begin // J
-                    is_reg1_valid = 1'b0;
-                    is_reg2_valid = 1'b0;
-                    jump = 2'b01;
-                end
+            6'b001110: begin // XORi
+                is_reg2_valid = 1'b0;
+                dest_reg_write = 1'b1;
+                is_sign_extended = 1'b0;
+                alu_op = 4'b0100;
+                // is_imm = 1'b1;
+            end
+            
+            6'b001101: begin // ORi
+                is_reg2_valid = 1'b0;
+                dest_reg_write = 1'b1;
+                is_sign_extended = 1'b0;
+                alu_op = 4'b0101;
+                // is_imm = 1'b1;
+            end
 
-                6'b000011: begin // JAL
-                    is_reg1_valid = 1'b0;
-                    is_reg2_valid = 1'b0;
-                    dest_reg_write = 1'b1;
-                    jump = 2'b10;
-                end
+            6'b000100, 6'b000101: begin // BEQ, BNE
+                branch = opcode[2:0];
+                alu_op = 4'b1000;
+                // is_imm = 1'b1;
+            end
 
-                default: begin
-                end
-            endcase
-        // end
-        // else begin
-        //     {dest_reg_write, mem_write, alu_op} = 0;
-        // end
+            6'b000110, 6'b000111: begin // BLEZ, BGTZ
+                is_reg2_valid = 1'b0;
+                branch = opcode[2:0];
+                alu_op = 4'b1000;
+                // is_imm = 1'b1;
+            end
+
+            6'b000001: begin // BGEZ
+                is_reg2_valid = 1'b0;
+                branch = 3'b001;
+                // is_imm = 1'b1;
+            end
+
+                6'b100011: begin // LW 
+                is_reg2_valid = 1'b0;
+                dest_reg_write = 1'b1;
+
+                alu_op = 4'b0001;
+                mem_read = 1'b1; // has no effect
+                mem_to_reg = 1;
+                // is_imm = 1'b1;
+            end
+
+            6'b101011: begin // SW
+                alu_op = 4'b0001;
+                mem_write = 1'b1;
+                is_SW_SB = 1'b1;
+            end
+
+            6'b100000: begin // LB
+                dest_reg_write = 1'b1;
+                alu_op = 4'b0001;
+                is_LB_SB = 1'b1;
+                mem_read = 1'b1; // has no effect
+                mem_to_reg = 1;
+                is_reg2_valid = 1'b0;
+                // is_imm = 1'b1;
+            end
+
+            6'b101000: begin // SB
+                alu_op = 4'b0001;
+                is_LB_SB = 1'b1;
+                mem_write = 1'b1;
+                is_SW_SB = 1'b1;
+            end
+            
+            
+            6'b001010: begin // SLTi
+                is_reg2_valid = 1'b0;
+                dest_reg_write = 1'b1;
+                alu_op = 4'b0110;
+                // is_imm = 1'b1;
+            end
+            
+            6'b001111: begin // Lui
+                is_reg1_valid = 1'b0;
+                is_reg2_valid = 1'b0;
+                dest_reg_write = 1'b1;
+                alu_op = 4'b0111;
+                // is_imm = 1'b1;
+            end
+
+            // J type
+            6'b000010: begin // J
+                is_reg1_valid = 1'b0;
+                is_reg2_valid = 1'b0;
+                jump = 2'b01;
+            end
+
+            6'b000011: begin // JAL
+                is_reg1_valid = 1'b0;
+                is_reg2_valid = 1'b0;
+                dest_reg_write = 1'b1;
+                jump = 2'b10;
+            end
+
+            default: begin
+            end
+        endcase
     end
 endmodule

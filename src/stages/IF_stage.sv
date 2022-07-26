@@ -12,7 +12,6 @@ module IF_stage(
     rs_data,
     inst,
     cache_en,
-    hit,
     sign_extend_immediate, 
     freeze
 );
@@ -26,7 +25,6 @@ module IF_stage(
     input [31:0]     rs_data;
     input [31:0]     inst;
     input            cache_en;
-    input            hit;
     input [31:0]     sign_extend_immediate;
     input            freeze;
     

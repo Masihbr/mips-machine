@@ -76,8 +76,6 @@ module MEM_stage(
         
     end
 
-  
-
     cache cache_unit(
         // outputs
         .hit(hit),
@@ -95,31 +93,4 @@ module MEM_stage(
         .rst_b(rst_b)
     );
 
-    integer clk_count;
-    always_ff @(posedge clk, negedge rst_b) begin
-        if (!rst_b)
-            clk_count <= 0;
-        else begin
-            $display("-----------------MEM stage(%d)-------------------", clk_count);
-            $display("mem_write= %b", mem_write);
-            $display("alu_result= %b", alu_result);
-            $display("is_= %b", is_LB_SB);
-            $display("is_SW_SB= %b", is_SW_SB);
-            $display("saved_val= %b",saved_val);
-            $display("cache_data_in= %b",{cache_data_in[0],cache_data_in[1],cache_data_in[2],cache_data_in[3]});
-            $display("rt_data= %b", rt_data);
-            $display("mem_data_out= %b", {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]});
-            $display("cache_en= %b", cache_en);
-            $display("clk= %b", clk);
-            $display("rst_b= %b", rst_b);
-            $display("hit= %b", hit);
-            $display("cache_data_out= %b", {cache_data_out[0], cache_data_out[1], cache_data_out[2], cache_data_out[3]});
-            $display("mem_data_in= %b", mem_data_in);
-            $display("mem_write_en= %b", mem_write_en);
-            $display("mem_addr= %b", mem_addr);
-            $display("mem_block= %b", mem_block);
-
-            clk_count <= clk_count + 1;
-        end
-    end
 endmodule
