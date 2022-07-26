@@ -112,9 +112,6 @@ module floating_point_alu(
                     if (a_real > b_real) begin
                         result_real = a_real;
                     end
-                    else if (a_real == b_real) begin
-                        result_real = 0;
-                    end
                     else begin
                         result_real = b_real;
                     end
@@ -134,6 +131,14 @@ module floating_point_alu(
                 4'b0110: begin
                     rounded = int'(a_real);
                     result_real = real'(rounded);
+                end
+                4'b0111: begin
+                    if (a_real < b_real) begin
+                        result_real = a_real;
+                    end
+                    else begin
+                        result_real = b_real;
+                    end
                 end
 
                 default: result_real = 0;

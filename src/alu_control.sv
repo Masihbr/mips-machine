@@ -31,34 +31,39 @@ module alu_control(
                 6'b100100: control = 4;
                 6'b100000: control = 0;
                 6'b000011: control = 12;
-                6'b111111: begin
+                6'b111111: begin // addf
                     control = 0;
                     alu_select = 1;
                 end
-                6'b111110: begin
+                6'b111110: begin // subf
                     control = 1;
                     alu_select = 1;
                 end
-                6'b111101: begin
+                6'b111101: begin // multf
                     control = 2;
                     alu_select = 1;
                 end
-                6'b111011: begin
+                6'b111011: begin // gf
                     control = 3;
                     alu_select = 1;
                 end
-                6'b110111: begin
+                6'b110111: begin // divf
                     control = 4;
                     alu_select = 1;
                 end
-                6'b101111: begin
+                6'b101111: begin // invf
                     control = 5;
                     alu_select = 1;
                 end
-                6'b011111: begin
+                6'b011111: begin // roundf
                     control = 6;
                     alu_select = 1;
                 end
+                6'b001111: begin // lf
+                    control = 7;
+                    alu_select = 1;
+                end
+                
                 default: control = 0;
             endcase
         end else begin
